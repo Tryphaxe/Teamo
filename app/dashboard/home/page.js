@@ -44,7 +44,7 @@ export default function page() {
 		<div>
 			<div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-6 text-white mb-3">
 				<h1 className="text-2xl font-bold mb-2">Tableau de bord administrateur</h1>
-				<p className="text-teal-100">Vue d'ensemble de la gestion des employés</p>
+				<p className="text-teal-100">Vue d&apos;ensemble de la gestion des employés</p>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">

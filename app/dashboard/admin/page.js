@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search } from 'lucide-r
 import toast from 'react-hot-toast';
 import axios from 'axios'
 
-export default function page() {
+export default function Page() {
 	const [showForm, setShowForm] = useState(false);
 	const [admins, setAdmins] = useState([])
 	const [isloading, setIsLoading] = useState(true)

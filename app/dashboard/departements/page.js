@@ -5,7 +5,7 @@ import { Info, Plus, Radius, Trash2 } from 'lucide-react';
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-export default function page() {
+export default function Page() {
 	const [showForm, setShowForm] = useState(false);
 	const [nom, setNom] = useState('')
 	const [loading, setLoading] = useState(false)

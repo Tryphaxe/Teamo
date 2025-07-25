@@ -5,7 +5,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { FolderPlus, Info, Plus, Radius, Search, Trash2, UserPlus, X } from 'lucide-react'
 
-export default function page() {
+export default function Page() {
 	const [showClientForm, setShowClientForm] = useState(false);
 	const [showProjetForm, setShowProjetForm] = useState(false);
 	const [nom, setNom] = useState('')

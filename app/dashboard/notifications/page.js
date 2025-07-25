@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Plus, Edit, Trash2, User, Mail, Briefcase, Bell } from 'lucide-react';
 
-export default function page() {
+export default function Page() {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -117,7 +117,7 @@ export default function page() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Il y 2 jours</p>
-              <p className="text-lg text-gray-900 mt-1">L'employé KONE Moussa demande 3 jours de congéspour cause maladie</p>
+              <p className="text-lg text-gray-900 mt-1">L&apos;employé KONE Moussa demande 3 jours de congéspour cause maladie</p>
             </div>
           </div>
         </div>

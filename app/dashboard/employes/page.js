@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search } from 'lucide-r
 import toast from 'react-hot-toast';
 import axios from 'axios'
 
-export default function page() {
+export default function Page() {
 	const [showForm, setShowForm] = useState(false);
 	const [employes, setEmployes] = useState([])
 	const [isloading, setIsLoading] = useState(true)
@@ -274,7 +274,7 @@ export default function page() {
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Date d'embauche
+									Date d&apos;embauche
 								</label>
 								<input
 									name="dateEntree"
@@ -429,7 +429,7 @@ export default function page() {
 										Salaire
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Date d'embauche
+										Date d&apos;embauche
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Mot de passe

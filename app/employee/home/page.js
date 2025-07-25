@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, DollarSign, Receipt, User, TrendingUp } from 'lucide-react';
 
-export default function page() {
+export default function Page() {
 	const [showExpenseForm, setShowExpenseForm] = useState(false);
 	const status = 'approved';
 	const emp = 1
