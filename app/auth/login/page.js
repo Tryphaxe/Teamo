@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
 	const [email, setEmail] = useState('');
@@ -44,11 +45,7 @@ export default function LoginPage() {
 				<div className="text-center mb-8">
 					<div className="flex justify-center mb-4">
 						<div className="flex items-center gap-3 ">
-							<img
-								src="/timo.png"
-								alt="Teamo Logo"
-								className="w-8 h-8 object-contain"
-							/>
+							<Image src="/timo.png" alt="Teamo Logo" width={16} height={16} className="w-8 h-8 object-contain" />
 						</div>
 					</div>
 					<h1 className="text-2xl font-bold text-gray-900 mb-2">Connexion à Timo</h1>
