@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { FolderPlus, Info, Plus, Radius, Search, Trash2, UserPlus, X } from 'lucide-react'
+import { Folder, FolderDot, FolderPlus, Folders, FolderTree, Info, Plus, Radius, Search, Trash2, Upload, UserPlus, X } from 'lucide-react'
 
 export default function Page() {
 	const [showClientForm, setShowClientForm] = useState(false);
@@ -238,17 +238,16 @@ export default function Page() {
 					</form>
 				</div>
 			)}
-			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold text-gray-900">Gestion des clients et projets</h1>
+			<div className="flex items-center justify-between gap-3 mb-4">
 				{/* Champ de recherche */}
-				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden min-w-64">
+				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden w-full">
 					<Search size={15} color="gray" />
 					<input
 						type="text"
 						placeholder="Rechercher"
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
-						className="bg-transparent border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
+						className="bg-transparent w-full border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
 					/>
 				</div>
 				<div className="flex items-center gap-2">
@@ -272,8 +271,14 @@ export default function Page() {
 			<div className="">
 				{/* Liste des clients */}
 				<div className="bg-white rounded-xl border border-gray-200">
-					<div className="p-6 border-b border-gray-200">
+					<div className="p-3 border-b border-gray-200 flex items-center justify-between">
 						<h3 className="text-lg font-semibold text-gray-900">Clients et projets</h3>
+						<button
+							onClick={() => setShowForm(true)}
+							className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
+						>
+							<Upload className="w-4 h-4" />
+						</button>
 					</div>
 					<div className="p-6">
 						<div className="">
@@ -295,7 +300,7 @@ export default function Page() {
 										<li key={client.id} className="transition-all">
 											<details className="bg-gray-50 p-3 rounded-lg">
 												<summary className="cursor-pointer font-semibold flex items-center justify-between">
-													<div>📁 {client.nom}</div>
+													<div className="flex items-center gap-2"><Folders className='w-4 h-4 text-gray-500' /> {client.nom}</div>
 													<button
 														onClick={() => handleDeleteClient(client.id)}
 														className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-50 text-black rounded-lg hover:bg-red-700 hover:text-white transition-colors"
@@ -303,13 +308,20 @@ export default function Page() {
 														<Trash2 className="w-4 h-4" />
 													</button>
 												</summary>
-												<ul className="pl-6 mt-2 space-y-3 border-l border-blue-900">
+												<ul className="space-y-3 border-l border-dashed border-blue-900">
 													{client.projets && client.projets.length > 0 ? (
 														client.projets.map((projet) => (
-															<li key={projet.id} className="flex items-center justify-between">
+															<li key={projet.id} className="flex items-center justify-between gap-2">
 																<div className='flex flex-col gap-1'>
-																	<span>📄Projet : {projet.nom}</span>
-																	<span className="italic text-sm text-gray-600">Crée le {formatDate(projet.createdAt)}</span>
+																	<div className="flex items-center gap-2">
+																		<span className="w-8 border-b border-blue-950 border-dashed"></span>
+																	 	<Folder className='w-4 h-4 text-gray-500' />
+																		{projet.nom}
+																	 </div>
+																	<div className="flex items-center italic text-sm text-gray-600">
+																		<span className="w-4 border-b border-blue-950 border-dashed mr-2"></span>
+																		Crée le {formatDate(projet.createdAt)}
+																	</div>
 																</div>
 
 																<button

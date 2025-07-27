@@ -4,7 +4,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div>
       <Header />
-      <div className="w-full px-4 sm:px-10 py-6 bg-gray-50">
+      <div className="w-full p-4 sm:p-6 bg-gray-50">
         {children}
       </div>
     </div>

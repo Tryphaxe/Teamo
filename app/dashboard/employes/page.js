@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search, Check, ChevronsDownUp, ListFilter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
 	const [employes, setEmployes] = useState([])
 	const [isloading, setIsLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
-	const [departements, setDepartements] = useState([])
+	const [departements, setDepartements] = useState([]);
+	const [selectedDept, setSelectedDept] = useState(departements[0] || { id: null, nom: 'Tous...' });
 	const [editMode, setEditMode] = useState(false);
 	const [selectedEmploye, setSelectedEmploye] = useState(null);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -135,10 +138,14 @@ export default function Page() {
 		}
 	}
 
+	// 🔍 Filtrage dynamique
 	const filteredEmployes = employes.filter((employe) => {
 		const fullName = `${employe.nom} ${employe.prenom}`.toLowerCase();
-		return fullName.includes(searchTerm.toLowerCase());
+		const matchesSearch = fullName.includes(searchTerm.toLowerCase());
+		const matchesDept = selectedDept.id ? employe.departement?.id === selectedDept.id : true;
+		return matchesSearch && matchesDept;
 	});
+
 
 	return (
 		<div>
@@ -149,7 +156,7 @@ export default function Page() {
 					</h3>
 					<form onSubmit={handleSubmit} className="space-y-4 text-black">
 						<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 mb-4 text-orange-600 text-xl">
-							<span className='uppercase'>Informations personnelles</span>
+							<span className='uppercase'>Informations deptnelles</span>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
@@ -347,37 +354,69 @@ export default function Page() {
 				</div>
 			)}
 
-			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold text-gray-900">Gestion des employés</h1>
+			<div className="flex items-center justify-between gap-3 mb-4">
+				{/* Champ de tri */}
+				<Listbox value={selectedDept} onChange={setSelectedDept}>
+					<div className="relative text-black">
+						<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-teal-600 sm:text-sm/6">
+							{/* <span className="flex items-center gap-3 pr-6">
+								<span className="hidden">{selectedDept ? selectedDept.nom : 'Tous les départements'}</span>
+							</span> */}
+							<ListFilter size={20} color="#333" />
+						</ListboxButton>
+
+						<ListboxOptions
+							transition
+							className="absolute z-10 mt-1 max-h-56 min-w-max overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
+						>
+							{[{ id: null, nom: 'Tous...' }, ...departements].map((dept) => (
+								<ListboxOption
+									key={dept.id ?? 'all'}
+									value={dept}
+									className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-teal-600 data-focus:text-white data-focus:outline-hidden"
+								>
+									<div className="flex items-center min-w-max">
+										<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{dept.nom}</span>
+									</div>
+
+									<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-teal-600 group-not-data-selected:hidden group-data-focus:text-white">
+										<CheckIcon aria-hidden="true" className="size-5" />
+									</span>
+								</ListboxOption>
+							))}
+						</ListboxOptions>
+					</div>
+				</Listbox>
+
 				{/* Champ de recherche */}
-				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden min-w-64">
+				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden w-full">
 					<Search size={15} color="gray" />
 					<input
 						type="text"
-						placeholder="Rechercher"
+						placeholder="Rechercher employé..."
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
-						className="bg-transparent border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
+						className="bg-transparent w-full border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
 					/>
 				</div>
+
 				<button
 					onClick={() => setShowForm(true)}
 					className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
 				>
 					<Plus className="w-4 h-4" />
-					Ajouter un employé
+					Ajouter
 				</button>
 			</div>
 
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-				<div className="p-6 border-b border-gray-200 flex items-center justify-between">
+				<div className="p-3 border-b border-gray-200 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900">Liste des employés</h3>
 					<button
 						onClick={() => setShowForm(true)}
-						className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+						className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
 					>
 						<Upload className="w-4 h-4" />
-						Exporter
 					</button>
 				</div>
 				<div className="overflow-x-auto custom-scrollbar">

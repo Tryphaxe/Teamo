@@ -107,14 +107,14 @@ export default function Page() {
 				</div>
 			)}
 
-			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold text-gray-900">Gestion des départements</h1>
+			<div className="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
+				<h1 className="text-xl font-medium text-gray-900">Gestion des départements</h1>
 				<button
 					onClick={() => setShowForm(true)}
 					className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
 				>
 					<Plus className="w-4 h-4" />
-					Ajouter un département
+					Ajouter
 				</button>
 			</div>
 			{isloading ? (

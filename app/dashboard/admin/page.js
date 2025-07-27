@@ -168,17 +168,16 @@ export default function Page() {
 				</div>
 			)}
 
-			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-2xl font-bold text-gray-900">Gestion des comptes admin</h1>
+			<div className="flex items-center justify-between gap-3 mb-4">
 				{/* Champ de recherche */}
-				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden min-w-64">
+				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-2 p-2 overflow-hidden w-full">
 					<Search size={15} color="gray" />
 					<input
 						type="text"
-						placeholder="Rechercher"
+						placeholder="Rechercher admin..."
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
-						className="bg-transparent border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
+						className="bg-transparent w-full border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
 					/>
 				</div>
 				<button
