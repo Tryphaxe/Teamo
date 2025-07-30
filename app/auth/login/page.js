@@ -54,7 +54,7 @@ export default function LoginPage() {
 				<div className="text-center mb-8">
 					<div className="flex justify-center mb-4">
 						<div className="flex items-center gap-3 ">
-							<Image src="/timo.png" alt="Teamo Logo" width={60} height={60} className="w-auto h-8" />
+							<Image src="/images/timo.png" alt="Teamo Logo" width={60} height={60} className="w-auto h-8" />
 						</div>
 					</div>
 					<h1 className="text-2xl font-bold text-gray-900 mb-2">Connexion à Teamo</h1>

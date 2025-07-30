@@ -63,7 +63,7 @@ export default function Header() {
 						<div className="shrink-0 flex items-center gap-4">
 							<Image
 								alt="Teamo logo"
-								src="/timo.png"
+								src="/images/timo.png"
 								width={60}
 								height={60}
 								className="h-8 w-auto"
