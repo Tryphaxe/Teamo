@@ -21,7 +21,7 @@ model Administrateur {
   prenom    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  // Possibilité d’avoir un rôle ou permissions plus fines si besoin
+  role      String  @default("ADMIN")
 }
 
 model Departement {
@@ -45,6 +45,7 @@ model Employe {
   dateEntree    DateTime      @default(now())
   poste         String
   salaire       Float
+  role      String  @default("EMPLOYE")
   
   departementId Int
   departement   Departement   @relation(fields: [departementId], references: [id])

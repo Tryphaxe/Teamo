@@ -1,10 +1,11 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image'
+import Image from 'next/image';
 import Link from 'next/link';
-import { Home, Users, Settings, Bell, LogOut, Group, HandCoins, ShieldUser, MailQuestion, TreePalm, UserCog } from 'lucide-react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Home, Users, Settings, Bell, Group, HandCoins, ShieldUser, MailQuestion, TreePalm, UserCog, Loader2 } from 'lucide-react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { useEffect, useState } from 'react';
 
 const navigation = [
 	{ name: 'Home', href: '/dashboard/home', icon: Home },
@@ -23,9 +24,10 @@ function classNames(...classes) {
 
 export default function Header() {
 	const pathname = usePathname();
+	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(true);
 
 	const isActive = (href) => pathname.startsWith(href);
-	const userName = 'King Defta';
 	const router = useRouter()
 
 	const setShowNotifs = () => {
@@ -38,6 +40,20 @@ export default function Header() {
 		{ href: '/dashboard/notifications', icon: Bell, onClick: () => setShowNotifs() },
 		{ href: '/dashboard/parametres', icon: Settings, onClick: () => setShowSettings() },
 	];
+
+	useEffect(() => {
+		fetch('/api/auth/currentUser')
+			.then(res => res.json())
+			.then(data => {
+				setUser(data.user);
+				setLoading(false);
+			});
+	}, []);
+
+	const handleLogout = async () => {
+		await fetch('/api/auth/logout');
+		router.push('/auth/login');
+	};
 
 	return (
 		<div className="bg-white sticky top-0 z-50 border-b border-gray-200">
@@ -53,8 +69,10 @@ export default function Header() {
 								className="h-8 w-auto"
 							/>
 							<div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-								<div className="text-right">
-									<p className="text-sm font-medium text-gray-900">King Defta</p>
+								<div className="text-right flex items-center justify-center">
+									<p className="text-sm font-medium text-gray-900">
+										{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.nom : 'Non connecté'}
+									</p>
 								</div>
 								<div className="bg-teal-100 px-3 py-1 rounded-full flex items-center justify-center">
 									<p className="text-sm text-black capitalize">Admin</p>
@@ -84,9 +102,7 @@ export default function Header() {
 										<span className="sr-only">Open user menu</span>
 										<div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
 											<span className="text-sm font-medium text-teal-700">
-												{
-													userName.split(' ').map(n => n[0]).join('')
-												}
+												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? (user.nom + " " + user.prenom).split(' ').map(n => n[0]).join('') : 'X'}
 											</span>
 										</div>
 									</MenuButton>
@@ -96,11 +112,19 @@ export default function Header() {
 										className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
 									>
 										<MenuItem>
+											<span className="block px-4 py-2 text-sm text-orange-700 data-focus:bg-gray-100 data-focus:outline-hidden">
+												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.nom : 'Non connecté'}
+											</span>
+										</MenuItem>
+										<MenuItem>
+											<span></span>
+										</MenuItem>
+										<MenuItem>
 											<a
 												href="#"
 												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
 											>
-												Your Profile
+												Mon profil
 											</a>
 										</MenuItem>
 										<MenuItem>
@@ -108,16 +132,17 @@ export default function Header() {
 												href="#"
 												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
 											>
-												Settings
+												Paramètres
 											</a>
 										</MenuItem>
 										<MenuItem>
-											<a
-												href="#"
-												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+											<button
+												type='button'
+												onClick={() => { handleLogout() }}
+												className="block w-full px-4 py-2 text-md font-bold cursor-pointer bg-red-100 text-red-700 data-focus:bg-gray-100 data-focus:outline-hidden"
 											>
-												Sign out
-											</a>
+												Déconnexion
+											</button>
 										</MenuItem>
 									</MenuItems>
 								</Menu>
