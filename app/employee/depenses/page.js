@@ -8,7 +8,7 @@ import { fetchDepenses } from '@/lib/api/apiDepense';
 import { handleFormChange } from '@/lib/api/formUtils';
 import { fetchProjets } from '@/lib/api/apiProjet';
 
-export default function page() {
+export default function Page() {
 	const [showForm, setShowForm] = useState(false);
 	const [projets, setProjets] = useState([]);
 	const [depenses, setDepenses] = useState([]);

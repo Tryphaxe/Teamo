@@ -16,7 +16,7 @@ export default function UnauthorizedPage() {
         </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Accès refusé</h1>
         <p className="text-gray-600 mb-6">
-          Vous n'avez pas les autorisations nécessaires pour accéder à cette page.
+          Vous n&apos;avez pas les autorisations nécessaires pour accéder à cette page.
         </p>
         <button
           onClick={() => router.replace("/auth/login")}
