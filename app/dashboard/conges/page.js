@@ -32,7 +32,7 @@ export default function Page() {
 
 	const total = conges.length;
 	const enAttente = conges.filter(d => d.statut === 'EN_ATTENTE').length;
-	const acceptes = conges.filter(d => d.statut === 'ACCEPTE').length;
+	const acceptes = conges.filter(d => d.statut === 'VALIDE').length;
 	const refuses = conges.filter(d => d.statut === 'REFUSE').length;
 
 	return (

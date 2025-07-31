@@ -1,87 +1,98 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Administrateur {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   password  String
   nom       String
   prenom    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  role      String  @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      String   @default("ADMIN")
 }
 
 model Departement {
-  id        Int        @id @default(autoincrement())
-  nom       String     @unique
+  id        Int       @id @default(autoincrement())
+  nom       String    @unique
+  createdAt DateTime  @default(now())
   employes  Employe[]
-  createdAt    DateTime      @default(now())
 }
 
 model Employe {
-  id            Int           @id @default(autoincrement())
-  email         String        @unique
+  id            Int         @id @default(autoincrement())
+  email         String      @unique
   password      String
   nom           String
   prenom        String
-  telephone     String?
-  adresse       String?
-  genre         String?
-
+  departementId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  dateEntree    DateTime    @default(now())
   dateNaissance DateTime
-  dateEntree    DateTime      @default(now())
   poste         String
   salaire       Float
-  role      String  @default("EMPLOYE")
-  
-  departementId Int
-  departement   Departement   @relation(fields: [departementId], references: [id])
-  conges       Conge[]
-  depenses     Depense[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  adresse       String?
+  genre         String?
+  telephone     String?
+  role          String      @default("EMPLOYE")
+  conges        Conge[]
+  depenses      Depense[]
+  departement   Departement @relation(fields: [departementId], references: [id])
 }
 
 model Client {
-  id        Int        @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   nom       String
+  createdAt DateTime @default(now())
   projets   Projet[]
-  createdAt    DateTime      @default(now())
 }
 
 model Projet {
-  id         Int        @id @default(autoincrement())
-  nom        String
-  clientId   Int
-  client     Client     @relation(fields: [clientId], references: [id])
-  depenses   Depense[]
-  createdAt    DateTime      @default(now())
+  id        Int       @id @default(autoincrement())
+  nom       String
+  clientId  Int
+  createdAt DateTime  @default(now())
+  depenses  Depense[]
+  client    Client    @relation(fields: [clientId], references: [id])
 }
 
 model Depense {
-  id          Int        @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   employeId   Int
   projetId    Int
   montant     Float
   description String?
-  statut      StatutDepense  @default(EN_ATTENTE) // accepté, refusé, en attente
-  date        DateTime   @default(now())
-  employe     Employe    @relation(fields: [employeId], references: [id])
-  projet      Projet     @relation(fields: [projetId], references: [id])
-  createdAt    DateTime      @default(now())
+  statut      StatutDepense @default(EN_ATTENTE)
+  date        DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  employe     Employe       @relation(fields: [employeId], references: [id])
+  projet      Projet        @relation(fields: [projetId], references: [id])
+}
+
+model Conge {
+  id        Int         @id @default(autoincrement())
+  employeId Int
+  dateDebut DateTime
+  dateFin   DateTime
+  type      TypeConge
+  statut    StatutConge @default(EN_ATTENTE)
+  raison    String?
+  createdAt DateTime    @default(now())
+  employe   Employe     @relation(fields: [employeId], references: [id])
+}
+
+model Vacance {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  dateDebut DateTime
+  dateFin   DateTime
 }
 
 enum StatutDepense {
@@ -90,35 +101,15 @@ enum StatutDepense {
   REFUSE
 }
 
-model Conge {
-  id          Int         @id @default(autoincrement())
-  employeId   Int
-  dateDebut   DateTime
-  dateFin     DateTime
-  type        TypeConge
-  statut      StatutConge  @default(EN_ATTENTE) // validé, refusé, en attente
-  raison      String?
-  employe     Employe     @relation(fields: [employeId], references: [id])
-  createdAt    DateTime      @default(now())
-}
-
 enum TypeConge {
   MALADIE
   PERSONNEL
   AUTRE
-  VACANCES   // Peut être géré séparément si tu veux que ce soit automatique
+  VACANCES
 }
 
 enum StatutConge {
   EN_ATTENTE
   VALIDE
   REFUSE
-}
-
-model Vacance {
-  id        Int       @id @default(autoincrement())
-  nom       String
-  dateDebut DateTime
-  dateFin   DateTime
-  // Vacances définies par l’administrateur, visibles par tous
 }
