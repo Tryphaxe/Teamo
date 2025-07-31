@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/date';
 
 import { fetchConges, refuserConge, validerConge } from '@/lib/api/apiConge';
 
-export default function page() {
+export default function Page() {
 	const [conges, setConges] = useState([]);
 	const [isloading, setIsLoading] = useState(true);
 
