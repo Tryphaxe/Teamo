@@ -2,68 +2,37 @@
 
 import React, { useState, useEffect } from 'react'
 import { Info, Plus, Radius, Trash2 } from 'lucide-react';
-import axios from 'axios'
-import toast from 'react-hot-toast'
+import { deleteDepartement, fetchDepartements, submitForm } from '@/lib/api/apiDepartement';
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
-	const [nom, setNom] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [departements, setDepartements] = useState([])
 	const [isloading, setIsLoading] = useState(true)
 
-	// Fonction pour récupérer la liste des départements
-	const fetchDepartements = async () => {
-		try {
-			const res = await axios.get('/api/departements')
-			setDepartements(res.data)
-		} catch (error) {
-			toast.error('Erreur lors du chargement des départements.')
-		} finally {
-			setIsLoading(false)
-		}
-	}
+	const [form, setForm] = useState({
+		nom: '',
+	});
+	const handleChange = (e) => {
+		setForm({ ...form, [e.target.name]: e.target.value });
+	};
+
 	useEffect(() => {
-		fetchDepartements()
-	}, [])
+		fetchDepartements(setDepartements, setIsLoading);
+	}, []);
 
-	// Handler pour soumettre le formulaire
+	// Fonction pour enregistrer un nouveau departement
 	const handleSubmit = async (e) => {
-		e.preventDefault()
-		setLoading(true)
-
-		const toastId = toast.loading('Ajout du département...')
-
-		try {
-			const res = await axios.post('/api/departements', { nom })
-
-			toast.success(`Département "${res.data.nom}" ajouté avec succès.`, { id: toastId })
-			setNom('')
-		} catch (error) {
-			const msg = error.response?.data?.error || 'Erreur inconnue'
-			toast.error(msg, { id: toastId })
-		} finally {
-			setLoading(false)
-			setShowForm(false)
-			fetchDepartements() // Recharger la liste des départements
-		}
-	}
-
-	// Fonction pour supprimer un département
-	const handleDelete = async (id) => {
-		const confirm = window.confirm('Supprimer ce département ?')
-		if (!confirm) return
-
-		const toastId = toast.loading('Suppression en cours...')
-
-		try {
-			await axios.delete(`/api/departements/${id}`)
-			toast.success('Département supprimé.', { id: toastId })
-			setDepartements((prev) => prev.filter((dep) => dep.id !== id))
-		} catch (error) {
-			toast.error('Erreur lors de la suppression.', { id: toastId })
-		}
-	}
+		e.preventDefault();
+		await submitForm({
+			data: form,
+			setLoading,
+			setShowForm,
+			reload: () => fetchDepartements(setDepartements, setIsLoading),
+			successMessage: "Departement ajouté avec succès.",
+			errorMessage: "Erreur lors de l'ajout du departement.",
+		});
+	};
 
 	return (
 		<div>
@@ -81,8 +50,7 @@ export default function Page() {
 								<input
 									type="text"
 									id="nom"
-									value={nom}
-									onChange={(e) => setNom(e.target.value)}
+									value={form.nom} onChange={handleChange}
 									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
 									required
 								/>
@@ -157,7 +125,7 @@ export default function Page() {
 									</div>
 								</div>
 								<button
-									onClick={() => handleDelete(dep.id)}
+									onClick={() => deleteDepartement(dep.id, fetchDepartements)}
 									className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
 								>
 									<Trash2 className="w-4 h-4" />

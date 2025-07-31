@@ -1,138 +1,64 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import toast from 'react-hot-toast'
 import { Folder, FolderDot, FolderPlus, Folders, FolderTree, Info, Plus, Radius, Search, Trash2, Upload, UserPlus, X } from 'lucide-react'
+import { deleteClient, fetchClients, submitClientForm } from '@/lib/api/apiClient';
+import { deleteProjet, fetchProjets, submitProjetForm } from '@/lib/api/apiProjet';
+import { formatDate } from '@/lib/date';
 
 export default function Page() {
 	const [showClientForm, setShowClientForm] = useState(false);
 	const [showProjetForm, setShowProjetForm] = useState(false);
-	const [nom, setNom] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [clients, setClients] = useState([])
 	const [projets, setProjets] = useState([])
 	const [isloading, setIsLoading] = useState(true)
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const [form, setForm] = useState({
+	//  Variables pour le formulaire de client et projet
+	const [formClient, setFormClient] = useState({
+		nom: '',
+	});
+	const handleClientChange = (e) => {
+		setFormClient({ ...formClient, [e.target.name]: e.target.value });
+	};
+	const [formProjet, setFormProjet] = useState({
 		nom: '',
 		clientId: '',
 	});
-	const handleChange = (e) => {
-		setForm({ ...form, [e.target.name]: e.target.value });
+	const handleProjetChange = (e) => {
+		setFormProjet({ ...formProjet, [e.target.name]: e.target.value });
 	};
-
-	// Fonction pour récupérer la liste des clients
-	const fetchClients = async () => {
-		try {
-			const res = await axios.get('/api/clients')
-			setClients(res.data)
-		} catch (error) {
-			toast.error('Erreur lors du chargement des clients.')
-		} finally {
-			setIsLoading(false)
-		}
-	}
-	// Fonction pour récupérer la liste des projets
-	// const fetchProjets = async () => {
-	// 	try {
-	// 		const res = await axios.get('/api/projets')
-	// 		setProjets(res.data)
-	// 	} catch (error) {
-	// 		toast.error('Erreur lors du chargement des projets.')
-	// 	} finally {
-	// 		setIsLoading(false)
-	// 	}
-	// }
+	
+	//  Fonction pour la liste des clients et projets
 	useEffect(() => {
-		fetchClients()
-		// fetchProjets()
-	}, [])
+		fetchClients(setClients, setIsLoading);
+		fetchProjets(setProjets, setIsLoading);
+	}, []);
 
-	// Handler pour soumettre le formulaire client
+	// Fonction pour enregistrer un nouveau client
 	const handleClientSubmit = async (e) => {
-		e.preventDefault()
-		setLoading(true)
-
-		const toastId = toast.loading('Ajout du client...')
-
-		try {
-			const res = await axios.post('/api/clients', { nom })
-
-			toast.success(`Client "${res.data.nom}" ajouté avec succès.`, { id: toastId })
-			setNom('')
-		} catch (error) {
-			const msg = error.response?.data?.error || 'Erreur inconnue'
-			toast.error(msg, { id: toastId })
-		} finally {
-			setLoading(false)
-			setShowClientForm(false)
-			fetchClients() // Recharger la liste des clients
-		}
-	}
-
-	// Handler pour soumettre le formulaire projet
+		e.preventDefault();
+		await submitClientForm({
+			data: formClient,
+			setLoading,
+			setShowForm: setShowClientForm,
+			reload: () => fetchClients(setClients, setIsLoading),
+			successMessage: "Client ajoutée avec succès.",
+			errorMessage: "Erreur lors de l'ajout du client.",
+		});
+	};
+	// Fonction pour enregistrer un nouveau projet
 	const handleProjetSubmit = async (e) => {
-		e.preventDefault()
-		setLoading(true)
-		const toastId = toast.loading('Ajout du projet...')
-		try {
-			const res = await fetch('/api/projets', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(form),
-			});
-			const data = await res.json();
-
-			if (!res.ok) {
-				toast.error(data.error || "Erreur lors de l'enregistrement", { id: toastId });
-				return;
-			}
-			toast.success(
-				`Projet - ${data.nom} - ajouté avec succès.`,
-				{ id: toastId }
-			);
-
-			setShowProjetForm(false);
-			fetchClients();
-		} catch (err) {
-			toast.error('Erreur lors de l\'enregistrement.', { id: toastId })
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	// Handler pour supprimer un projet
-	const handleDeleteProjet = async (id) => {
-		if (!confirm("Voulez-vous vraiment supprimer ce projet ?")) return;
-		const toastId = toast.loading('Suppression en cours...')
-		try {
-			await axios.delete(`/api/projets/${id}`)
-			toast.success('Projet supprimé.', { id: toastId })
-			fetchClients() // Recharger la liste des employés
-		} catch (error) {
-			toast.error('Erreur lors de la suppression.', { id: toastId })
-		}
-	};
-
-	// Handler pour supprimer un client
-	const handleDeleteClient = async (id) => {
-		if (!confirm("Vous allez supprimer ce client et tous ses projets ?")) return;
-		const toastId = toast.loading('Suppression en cours...')
-		try {
-			await axios.delete(`/api/clients/${id}`)
-			toast.success("Client supprimé avec ses projets.", { id: toastId });
-			fetchClients();
-		} catch (error) {
-			toast.error("Erreur lors de la suppression.", { id: toastId });
-		}
-	};
-
-	const formatDate = (dateStr) => {
-		if (!dateStr) return '';
-		const date = new Date(dateStr);
-		return date.toLocaleDateString('fr-FR');
+		e.preventDefault();
+		await submitProjetForm({
+			data: formProjet,
+			setLoading,
+			setShowForm: setShowProjetForm,
+			reload: () => fetchProjets(setProjets, setIsLoading),
+			successMessage: "Projet ajoutée avec succès.",
+			errorMessage: "Erreur lors de l'ajout du projet.",
+		});
 	};
 
 	const filteredClients = clients.filter((client) =>
@@ -156,8 +82,7 @@ export default function Page() {
 									type="text"
 									id="nom"
 									name="nom"
-									value={nom}
-									onChange={(e) => setNom(e.target.value)}
+									value={formClient.nom} onChange={handleClientChange}
 									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
 									required
 								/>
@@ -197,7 +122,7 @@ export default function Page() {
 									type="text"
 									id="nompro"
 									name="nom"
-									value={form.nom} onChange={handleChange}
+									value={formProjet.nom} onChange={handleProjetChange}
 									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
 									required
 								/>
@@ -208,7 +133,7 @@ export default function Page() {
 								</label>
 								<select
 									name="clientId"
-									value={form.clientId} onChange={handleChange}
+									value={formProjet.clientId} onChange={handleProjetChange}
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
 									required
 								>
@@ -302,7 +227,7 @@ export default function Page() {
 												<summary className="cursor-pointer font-semibold flex items-center justify-between">
 													<div className="flex items-center gap-2"><Folders className='w-4 h-4 text-gray-500' /> {client.nom}</div>
 													<button
-														onClick={() => handleDeleteClient(client.id)}
+														onClick={() => deleteClient(client.id, fetchClients)}
 														className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-50 text-black rounded-lg hover:bg-red-700 hover:text-white transition-colors"
 													>
 														<Trash2 className="w-4 h-4" />
@@ -315,9 +240,9 @@ export default function Page() {
 																<div className='flex flex-col gap-1'>
 																	<div className="flex items-center gap-2">
 																		<span className="w-8 border-b border-blue-950 border-dashed"></span>
-																	 	<Folder className='w-4 h-4 text-gray-500' />
+																		<Folder className='w-4 h-4 text-gray-500' />
 																		{projet.nom}
-																	 </div>
+																	</div>
 																	<div className="flex items-center italic text-sm text-gray-600">
 																		<span className="w-4 border-b border-blue-950 border-dashed mr-2"></span>
 																		Crée le {formatDate(projet.createdAt)}
@@ -325,7 +250,7 @@ export default function Page() {
 																</div>
 
 																<button
-																	onClick={() => handleDeleteProjet(projet.id)}
+																	onClick={() => deleteProjet(projet.id, fetchClients)}
 																	className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-50 text-red-800 rounded-lg hover:bg-gray-100 transition-colors"
 																>
 																	<X className="w-4 h-4" />

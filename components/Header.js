@@ -51,7 +51,7 @@ export default function Header() {
 	}, []);
 
 	const handleLogout = async () => {
-		await fetch('/api/auth/logout');
+		await fetch('/api/auth/logout', {method: "GET"});
 		router.push('/auth/login');
 	};
 

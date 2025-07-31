@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search } from 'lucide-react';
-import toast from 'react-hot-toast';
-import axios from 'axios'
+import { deleteVacance, fetchVacances } from '@/lib/api/apiVacance';
+import { formatDate } from '@/lib/date';
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
@@ -21,79 +21,27 @@ export default function Page() {
 		setForm({ ...form, [e.target.name]: e.target.value });
 	};
 
-	// Fonction pour récupérer la liste des vacances
-	const fetchVacances = async () => {
-		try {
-			const res = await axios.get('/api/vacances');
-			setVacances(res.data)
-		} catch (error) {
-			toast.error('Erreur lors du chargement des vacances.')
-		} finally {
-			setIsLoading(false)
-		}
-	}
 	useEffect(() => {
-		fetchVacances()
-	}, [])
+		fetchVacances(setVacances, setIsLoading);
+	}, []);
 
 	// Fonction pour enregistrer une nouvelle vacance
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
-		const toastId = toast.loading("Enregistrement en cours...");
-		try {
-			const res = await fetch('/api/vacances', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(form),
-			});
-
-			const data = await res.json();
-
-			if (!res.ok) {
-				toast.error(data.error || "Erreur lors de l'enregistrement", { id: toastId });
-				return;
-			}
-			toast.success(`Vacance ${data.nom} ajouté avec succès.`,
-				{ id: toastId }
-			);
-
-			setShowForm(false);
-			fetchVacances();
-
-		} catch (err) {
-			toast.error('Erreur lors de l\'enregistrement.', { id: toastId })
-		} finally {
-			setLoading(false)
-		}
+		await submitForm({
+			data: form,
+			setLoading,
+			setShowForm,
+			reload: () => fetchVacances(setVacances, setIsLoading),
+			successMessage: "Vacance ajoutée avec succès.",
+			errorMessage: "Erreur lors de l'ajout.",
+		});
 	};
-
-	// Fonction pour supprimer une vacance
-	const handleDelete = async (id) => {
-		const confirm = window.confirm('Supprimer cette donnée ?')
-		if (!confirm) return
-
-		const toastId = toast.loading('Suppression en cours...')
-
-		try {
-			await axios.delete(`/api/vacances/${id}`)
-			toast.success('Vacance supprimée.', { id: toastId })
-			fetchVacances()
-		} catch (error) {
-			toast.error('Erreur lors de la suppression.', { id: toastId })
-		}
-	}
 
 	const filteredVacances = vacances.filter((vacance) => {
 		const fullName = `${vacance.nom}`.toLowerCase();
 		return fullName.includes(searchTerm.toLowerCase());
 	});
-
-	const formatDate = (dateStr) => {
-		if (!dateStr) return '';
-		const date = new Date(dateStr);
-		return date.toLocaleDateString('fr-FR');
-	};
 
 	return (
 		<div>
@@ -220,7 +168,7 @@ export default function Page() {
 									</div>
 								</div>
 								<button
-									onClick={() => handleDelete(vac.id)}
+									onClick={() => deleteVacance(vac.id, fetchVacances)}
 									className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-50 text-black rounded-lg hover:bg-red-700 hover:text-white transition-colors"
 								>
 									<Trash2 className="w-4 h-4" />

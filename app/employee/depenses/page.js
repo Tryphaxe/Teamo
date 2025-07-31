@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Check, Filter, Info, Plus, Radius, Upload, User, X } from 'lucide-react';
+import { Check, Filter, Info, ListFilter, Plus, Radius, Upload, User, X } from 'lucide-react';
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { formatDate } from '@/lib/date';
 
 import { submitForm } from '@/lib/api/apiDepense';
 import { fetchDepenses } from '@/lib/api/apiDepense';
@@ -15,11 +18,28 @@ export default function Page() {
 	const [isloading, setIsLoading] = useState(true);
 	const [loading, setLoading] = useState(false);
 
-	// Récupération des projets
+	const filtresDepenses = [
+		{ id: null, nom: 'Toutes' },
+		{ id: 'EN_ATTENTE', nom: 'En attente' },
+		{ id: 'ACCEPTE', nom: 'Acceptées' },
+		{ id: 'REFUSE', nom: 'Refusées' },
+	];
+	const [selectedStatus, setSelectedStatus] = useState(filtresDepenses[0]);
+	const filteredDepenses = selectedStatus.id
+		? depenses.filter(d => d.statut === selectedStatus.id)
+		: depenses;
+
+	// Récupération des dépenses & projets
 	useEffect(() => {
 		fetchProjets(setProjets, setIsLoading);
 		fetchDepenses(setDepenses, setIsLoading);
 	}, []);
+
+	const total = depenses.length;
+
+	const enAttente = depenses.filter(d => d.statut === 'EN_ATTENTE').length;
+	const acceptees = depenses.filter(d => d.statut === 'ACCEPTE').length;
+	const refusees = depenses.filter(d => d.statut === 'REFUSE').length;
 
 	const [form, setForm] = useState({
 		description: '',
@@ -35,7 +55,7 @@ export default function Page() {
 			data: form,
 			setLoading,
 			setShowForm,
-			reload: fetchProjets,
+			reload: () => fetchDepenses(setDepenses, setIsLoading),
 			successMessage: "Dépense ajoutée avec succès.",
 			errorMessage: "Erreur lors de l'ajout de la dépense.",
 		});
@@ -58,7 +78,7 @@ export default function Page() {
 									type="text"
 									name="description"
 									value={form.description} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -69,7 +89,7 @@ export default function Page() {
 								<select
 									name="projetId"
 									value={form.projetId} onChange={handleChange}
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								>
 									<option value="">Sélectionner un projet</option>
@@ -86,7 +106,7 @@ export default function Page() {
 									type="number"
 									name="montant"
 									value={form.montant} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -94,7 +114,7 @@ export default function Page() {
 						<div className="flex gap-2">
 							<button
 								type="submit"
-								className="cursor-pointer px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								{loading ? 'Ajout en cours...' : 'Ajouter'}
 							</button>
@@ -112,57 +132,70 @@ export default function Page() {
 
 			<div className="flex items-center justify-between mb-3">
 				<h1 className="text-2xl font-bold text-gray-900">Gestion des dépenses</h1>
-				<div className="flex items-center gap-2">
-					<div className="flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-4 py-2">
-						<Filter className="w-4 h-4 text-gray-500" />
-						<select
-							className="border-none outline-none focus:ring-0 focus:ring-none focus:border-transparent text-black"
-						>
-							<option value="all">Toutes les dépenses</option>
-							<option value="pending">En attente</option>
-							<option value="approved">Approuvées</option>
-							<option value="rejected">Refusées</option>
-						</select>
-					</div>
-					<button
-						onClick={() => setShowForm(true)}
-						className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-					>
-						<Plus className="w-4 h-4" />
-						Ajouter
-					</button>
-				</div>
 			</div>
 
 			{/* Statistiques */}
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
 				<div className="bg-white rounded-lg border border-gray-200 p-4">
 					<p className="text-sm text-gray-600">Total des dépenses</p>
-					<p className="text-2xl font-bold text-gray-900">10</p>
+					<p className="text-2xl font-bold text-gray-900">{total}</p>
 				</div>
 				<div className="bg-white rounded-lg border border-gray-200 p-4">
 					<p className="text-sm text-gray-600">En attente</p>
-					<p className="text-2xl font-bold text-yellow-600">
-						3
-					</p>
+					<p className="text-2xl font-bold text-yellow-600">{enAttente}</p>
 				</div>
 				<div className="bg-white rounded-lg border border-gray-200 p-4">
 					<p className="text-sm text-gray-600">Approuvées</p>
-					<p className="text-2xl font-bold text-green-600">
-						6
-					</p>
+					<p className="text-2xl font-bold text-green-600">{acceptees}</p>
 				</div>
 				<div className="bg-white rounded-lg border border-gray-200 p-4">
-					<p className="text-sm text-gray-600">Montant total</p>
-					<p className="text-2xl font-bold text-gray-900">
-						{("1 000 000").toLocaleString()}€
-					</p>
+					<p className="text-sm text-gray-600">Refusées</p>
+					<p className="text-2xl font-bold text-red-600">{refusees}</p>
 				</div>
+			</div>
+
+			<div className="flex items-center justify-between mb-3">
+				<Listbox value={selectedStatus} onChange={setSelectedStatus}>
+					<div className="relative text-black">
+						<ListboxButton className="flex items-center cursor-pointer gap-2 font-medium px-3 py-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6">
+							<ListFilter size={20} color="#333" />
+							Statut
+						</ListboxButton>
+
+						<ListboxOptions
+							transition
+							className="absolute z-10 mt-1 max-h-56 min-w-max overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
+						>
+							{filtresDepenses.map((statut) => (
+								<ListboxOption
+									key={statut.id ?? 'all'}
+									value={statut}
+									className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-blue-600 data-focus:text-white data-focus:outline-hidden"
+								>
+									<div className="flex items-center min-w-max">
+										<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{statut.nom}</span>
+									</div>
+									<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-not-data-selected:hidden group-data-focus:text-white">
+										<CheckIcon aria-hidden="true" className="size-5" />
+									</span>
+								</ListboxOption>
+							))}
+						</ListboxOptions>
+					</div>
+				</Listbox>
+
+				<button
+					onClick={() => setShowForm(true)}
+					className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+				>
+					<Plus className="w-4 h-4" />
+					Ajouter
+				</button>
 			</div>
 
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="p-3 border-b border-gray-200 flex items-center justify-between">
-					<h3 className="text-lg font-semibold text-gray-900">Dépenses</h3>
+					<h3 className="text-lg font-semibold text-gray-900">Liste des dépenses</h3>
 					<button
 						onClick={() => setShowForm(true)}
 						className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
@@ -173,18 +206,18 @@ export default function Page() {
 				<div className="overflow-x-auto custom-scrollbar">
 					{isloading ? (
 						<div className="flex items-center justify-center gap-2 p-2">
-							<Radius className='animate-spin w-4 h-4 text-teal-950' />
+							<Radius className='animate-spin w-4 h-4 text-blue-950' />
 							<span className="ml-2 text-gray-700">Chargement des dépenses...</span>
 						</div>
-					) : depenses.length === 0 ? (
+					) : total === 0 ? (
 						<div className='flex flex-col items-center justify-center gap-2 p-2'>
-							<div className="flex items-center justify-center gap-3">
+							<div className="flex items-center justify-center gap-2">
 								<Info className='w-4 h-4 text-red-800' />
 								<span className="ml-2 text-gray-700">Aucun département trouvé</span>
 							</div>
 							<button
 								onClick={() => setShowForm(true)}
-								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								<Plus className="w-4 h-4" />
 								Ajouter
@@ -212,20 +245,20 @@ export default function Page() {
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
-								{depenses.map((dep) => (
+								{filteredDepenses.map((dep) => (
 									<tr key={dep.id} className="hover:bg-gray-50">
 										<td className="px-6 py-4 whitespace-nowrap">
 											<div className="flex items-center gap-3">
-												<div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-													<span className="text-sm font-medium text-teal-700">
+												<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+													<span className="text-sm font-medium text-blue-700">
 														{
-															(dep.projetId).split(' ').map(n => n[0]).join('')
+															(dep.projet.client.nom).split(' ').map(n => n[0]).join('')
 														}
 													</span>
 												</div>
 												<div>
 													<p className="font-medium text-gray-900">{dep.projet.nom}</p>
-													<p className="text-sm text-gray-500">{dep.projetId}</p>
+													<p className="text-sm text-gray-500">{dep.projet.client.nom}</p>
 												</div>
 											</div>
 										</td>
@@ -233,10 +266,10 @@ export default function Page() {
 											{dep.description}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{dep.montant.toLocaleString()} €
+											{dep.montant.toLocaleString()} Fcfa
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{dep.date}
+											{formatDate(dep.date)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											<span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-300">

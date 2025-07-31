@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search } from 'lucide-react';
-import toast from 'react-hot-toast';
-import axios from 'axios'
+
+import { deleteAdmin, fetchAdmins, submitForm } from '@/lib/api/apiAdmin';
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
@@ -22,68 +22,22 @@ export default function Page() {
 		setForm({ ...form, [e.target.name]: e.target.value });
 	};
 
-	// Fonction pour récupérer la liste des employés
-	const fetchAdmins = async () => {
-		try {
-			const res = await axios.get('/api/admins');
-			setAdmins(res.data)
-		} catch (error) {
-			toast.error('Erreur lors du chargement des admins.')
-		} finally {
-			setIsLoading(false)
-		}
-	}
 	useEffect(() => {
-		fetchAdmins()
-	}, [])
+		fetchAdmins(setAdmins, setIsLoading);
+	}, []);
 
-	// Fonction pour enregistrer un nouvel admin
+	// Fonction pour enregistrer une nouvelle dépense
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
-		const toastId = toast.loading("Enregistrement de l’administrateur...");
-		try {
-			const res = await fetch('/api/admins', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(form),
-			});
-
-			const data = await res.json();
-
-			if (!res.ok) {
-				toast.error(data.error || "Erreur lors de l'enregistrement", { id: toastId });
-				return;
-			}
-			toast.success(`Admin ${data.nom} ${data.prenom} ajouté avec succès.`,
-				{ id: toastId }
-			);
-
-			setShowForm(false);
-			fetchAdmins();
-
-		} catch (err) {
-			toast.error('Erreur lors de l\'enregistrement.', { id: toastId })
-		} finally {
-			setLoading(false)
-		}
+		await submitForm({
+			data: form,
+			setLoading,
+			setShowForm,
+			reload: () => fetchAdmins(setAdmins, setIsLoading),
+			successMessage: "Administrateur ajouté avec succès.",
+			errorMessage: "Erreur lors de l'ajout de l'administrateur.",
+		});
 	};
-
-	// Fonction pour supprimer un admin
-	const handleDelete = async (id) => {
-		const confirm = window.confirm('Supprimer cet admin ?')
-		if (!confirm) return
-
-		const toastId = toast.loading('Suppression en cours...')
-
-		try {
-			await axios.delete(`/api/admins/${id}`)
-			toast.success('Admin supprimé.', { id: toastId })
-			fetchAdmins() // Recharger la liste des admins
-		} catch (error) {
-			toast.error('Erreur lors de la suppression.', { id: toastId })
-		}
-	}
 
 	const filteredAdmins = admins.filter((admin) => {
 		const fullName = `${admin.nom} ${admin.prenom}`.toLowerCase();
@@ -226,7 +180,7 @@ export default function Page() {
 										<p className="text-2xl font-bold text-gray-900 mt-1">{ad.nom} {ad.prenom}</p>
 									</div>
 									<button
-										onClick={() => handleDelete(ad.id)}
+										onClick={() => deleteAdmin(ad.id, fetchAdmins)}
 										className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-50 text-black rounded-lg hover:bg-red-700 hover:text-white transition-colors"
 									>
 										<Trash2 className="w-4 h-4" />

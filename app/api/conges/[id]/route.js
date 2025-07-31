@@ -11,16 +11,32 @@ export async function GET(_, { params }) {
 }
 
 // Mettre à jour le statut d'une demande (admin)
-export async function PUT(req, { params }) {
-  const body = await req.json();
-  const { statut } = body;
+export async function PUT(request, { params }) {
+	const { id } = await params;
+	const body = await request.json();
+	const { statut } = body;
 
-  const updated = await prisma.conge.update({
-    where: { id: params.id },
-    data: { statut },
-  });
+	if (!['VALIDE', 'REFUSE'].includes(statut)) {
+		return NextResponse.json(
+			{ error: 'Statut invalide.' },
+			{ status: 400 }
+		);
+	}
 
-  return NextResponse.json(updated);
+	try {
+		const updatedConge = await prisma.conge.update({
+			where: { id: parseInt(id) },
+			data: { statut },
+		});
+
+		return NextResponse.json(updatedConge);
+	} catch (error) {
+		console.error(error);
+		return NextResponse.json(
+			{ error: 'Erreur lors de la mise à jour du congé.' },
+			{ status: 500 }
+		);
+	}
 }
 
 // Supprimer une demande
