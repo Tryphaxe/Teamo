@@ -131,9 +131,6 @@ export default function Page() {
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Statut
 									</th>
-									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Actions
-									</th>
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
@@ -166,11 +163,6 @@ export default function Page() {
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{formatDate(cong.dateFin)}
 										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											<span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-300">
-												{cong.statut}
-											</span>
-										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 											{cong.statut === "EN_ATTENTE" && (
 												<div className="flex gap-2">
@@ -191,10 +183,14 @@ export default function Page() {
 												</div>
 											)}
 											{cong.statut === 'VALIDE' && (
-												<p className="text-green-600 font-semibold mt-2">Congé validé</p>
+											<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
+												Congé validé
+											</span>
 											)}
 											{cong.statut === 'REFUSE' && (
-												<p className="text-red-600 font-semibold mt-2">Congé refusé</p>
+											<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
+												Congé refusé
+											</span>
 											)}
 										</td>
 									</tr>

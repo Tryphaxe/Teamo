@@ -1,17 +1,15 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { Receipt, User, UserRoundPen } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image'
-import Link from 'next/link';
-import { Home, Bell, HandCoins, MailQuestion, TreePalm, UserCog, Loader2 } from 'lucide-react';
+import { Calendar, Check, Receipt, User, UserRoundPen, X } from 'lucide-react';
+import { submitPresence } from "@/lib/api/apiPresence";
+import { formatDate } from '@/lib/date';
 
 
 export default function Page() {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const router = useRouter()
+	const today = new Date();
 
 	useEffect(() => {
 		fetch('/api/auth/currentUser')
@@ -21,9 +19,6 @@ export default function Page() {
 				setLoading(false);
 			});
 	}, []);
-
-	const status = 'approved';
-	const emp = 1
 
 	return (
 		<div className='space-y-3'>
@@ -75,43 +70,33 @@ export default function Page() {
 			<div className="bg-white rounded-xl border border-gray-200">
 				<div className="p-3 border-b border-gray-200">
 					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-gray-900">Mes Dépenses</h3>
+						<h3 className="text-lg font-semibold text-gray-900">Notifier sa présence</h3>
 					</div>
 				</div>
 
-				<div className="p-6">
-					{emp === 0 ? (
-						<div className="text-center py-8 text-gray-500">
-							<Receipt className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-							<p>Aucune dépense enregistrée</p>
-						</div>
-					) : (
-						<div className="space-y-3">
-							<div key="1" className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-								<div className="flex-1">
-									<div className="flex items-center gap-3">
-										<div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-											<Receipt className="w-5 h-5 text-orange-600" />
-										</div>
-										<div>
-											<p className="font-medium text-gray-900">Formation React Advanced</p>
-											<p className="text-sm text-gray-500">Formation • 2024-01-15</p>
-										</div>
-									</div>
-								</div>
-								<div className="text-right">
-									<p className="font-semibold text-gray-900">500 000Fcfa</p>
-									<span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${status === 'approved' ? 'bg-green-100 text-green-800' :
-										status === 'rejected' ? 'bg-red-100 text-red-800' :
-											'bg-yellow-100 text-yellow-800'
-										}`}>
-										{status === 'approved' ? 'Approuvé' :
-											status === 'rejected' ? 'Refusé' : 'En attente'}
-									</span>
-								</div>
+				<div className="p-3">
+						<div className="grid grid-cols-2">
+							<div className='flex items-center gap-x-2 text-orange-500 text-2xl font-bold'>
+								<Calendar className='text-orange-900 w-4 h-4' />
+								<p>{formatDate(today)}</p>
 							</div>
+							<form className="flex items-center justify-between sm:justify-end gap-x-2">
+								<button
+									onClick={() => submitPresence(true)}
+									className="flex items-center text-md gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+								>
+									<Check className="w-5 h-5" />
+									Présent
+								</button>
+								<button
+									onClick={() => submitPresence(false)}
+									className="flex items-center text-md gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+								>
+									<X className="w-5 h-5" />
+									Absent
+								</button>
+							</form>
 						</div>
-					)}
 				</div>
 			</div>
 		</div>

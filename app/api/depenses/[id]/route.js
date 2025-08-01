@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 // GET une dépense
 export async function GET(_, { params }) {

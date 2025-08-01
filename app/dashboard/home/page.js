@@ -1,23 +1,33 @@
 "use client";
 
 import React, { useEffect, useState } from 'react'
-import { Users, DollarSign, Receipt, Calendar, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, Calendar, AlertCircle, Search, ListFilter, User, Timer, Radius, Info } from 'lucide-react';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import { CheckIcon } from '@heroicons/react/20/solid'
 import { fetchEmployes } from '@/lib/api/apiEmploye';
 import { fetchDepenses } from '@/lib/api/apiDepense';
 import { fetchConges } from '@/lib/api/apiConge';
+import { fetchPresences, getPresencesByDate } from '@/lib/api/apiPresence';
+import PresenceHeader from '@/components/PresenceHeader';
+import dayjs from 'dayjs';
 
 export default function Page() {
 	const [employes, setEmployes] = useState([]);
 	const [depenses, setDepenses] = useState([]);
 	const [conges, setConges] = useState([]);
+	const [presences, setPresences] = useState([]);
 	const [isloading, setIsLoading] = useState(true);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedDate, setSelectedDate] = useState(dayjs());
 
+	const dateStr = selectedDate.format('YYYY-MM-DD');
 	//  Récupération fetch
 	useEffect(() => {
 		fetchEmployes(setEmployes, setIsLoading);
 		fetchDepenses(setDepenses, setIsLoading);
 		fetchConges(setConges, setIsLoading);
-	}, []);
+		getPresencesByDate(dateStr, setPresences, setIsLoading);
+	}, [dateStr]);
 
 	//  Récupération count
 	const totalEmployes = employes.length;
@@ -51,6 +61,23 @@ export default function Page() {
 		}
 	];
 
+	const filtres = [
+		{ id: null, nom: 'Choisir...' },
+		{ id: '0', nom: 'Absent' },
+		{ id: '1', nom: 'Présent' },
+	];
+	const [selectedAp, setSelectedAp] = useState(filtres[0]);
+
+	const filteredPresences = presences.filter((pres) => {
+		const fullName = `${pres.employe.nom} ${pres.employe.prenom}`.toLowerCase();
+		const matchesSearch = fullName.includes(searchTerm.toLowerCase());
+		const matchesAp =
+			selectedAp.id === null
+				? true
+				: pres.present === (selectedAp.id === '1');
+		return matchesSearch && matchesAp;
+	});
+
 	return (
 		<div>
 			<div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-6 text-white mb-3">
@@ -58,7 +85,7 @@ export default function Page() {
 				<p className="text-teal-100">Vue d&apos;ensemble de la gestion des employés</p>
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
 				{stats.map((stat, index) => {
 					const Icon = stat.icon;
 					return (
@@ -76,6 +103,104 @@ export default function Page() {
 					);
 				})}
 			</div>
+
+			<div className="bg-gradient-to-r from-white to-gray-50 rounded-lg px-6 py-2 text-black mb-3">
+				<h1 className="text-xl font-bold">Gestion des présences et absences</h1>
+			</div>
+
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+				<PresenceHeader onDateChange={setSelectedDate} />
+
+				{/* Champ de recherche */}
+				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-3 px-3 py-2 w-full">
+					<Search size={15} color="gray" />
+					<input
+						type="text"
+						placeholder="Rechercher employé..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						className="bg-transparent w-full border-none outline-none ring-0 focus:ring-0 focus:border-none focus:outline-none"
+					/>
+					{/* Champ de tri */}
+					<Listbox value={selectedAp} onChange={setSelectedAp}>
+						<div className="relative text-black">
+							<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-teal-600 sm:text-sm/6">
+								{/* <span className="flex items-center gap-3 pr-6">
+								<span className="hidden">{selectedDept ? selectedDept.nom : 'Tous les départements'}</span>
+							</span> */}
+								<ListFilter size={20} color="#333" />
+							</ListboxButton>
+
+							<ListboxOptions
+								transition
+								className="absolute z-10 mt-1 max-h-56 min-w-max overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
+							>
+								{filtres.map((ap) => (
+									<ListboxOption
+										key={ap.id ?? 'all'}
+										value={ap}
+										className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-teal-600 data-focus:text-white data-focus:outline-hidden"
+									>
+										<div className="flex items-center min-w-max">
+											<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{ap.nom}</span>
+										</div>
+
+										<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-teal-600 group-not-data-selected:hidden group-data-focus:text-white">
+											<CheckIcon aria-hidden="true" className="size-5" />
+										</span>
+									</ListboxOption>
+								))}
+							</ListboxOptions>
+						</div>
+					</Listbox>
+				</div>
+			</div>
+
+			{isloading ? (
+				<div className="flex items-center justify-center gap-3 p-3">
+					<Radius className='animate-spin w-4 h-4 text-teal-950' />
+					<span className="ml-2 text-gray-700">Chargement...</span>
+				</div>
+			) : presences.length === 0 ? (
+				<div className='flex flex-col items-center justify-center gap-3 p-3'>
+					<div className="flex items-center justify-center gap-3">
+						<Info className='w-4 h-4 text-red-800' />
+						<span className="ml-2 text-gray-700">Aucune présence trouvée !</span>
+					</div>
+				</div>
+			) : (
+				<ul role="list" className="divide-y divide-gray-100 bg-white px-4">
+					{filteredPresences.map(pres => (
+						<li key={pres.id} className="flex justify-between gap-x-6 py-5">
+							<div className="flex min-w-0 gap-x-4">
+								<div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+									<User className="w-5 h-5 text-teal-600" />
+								</div>
+								<div className="min-w-0 flex-auto">
+									<p className="text-sm font-semibold text-gray-900">{pres.employe.nom + " " + pres.employe.prenom}</p>
+									<p className="mt-1 truncate text-sm/5 text-gray-500">{pres.employe.email}</p>
+								</div>
+							</div>
+							<div className="shrink-0 flex items-center gap-2">
+								<p className="text-sm/6 text-gray-900 flex items-center rounded-full p-1 border border-gray-200 bg-gray-50"><Timer className='w-5 h-5' />&nbsp;19:50</p>
+								<p>|</p>
+								{pres.present === "0"
+									? (
+										<span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-md font-medium text-red-700 ring-1 ring-red-600/20 ring-inset">
+											Absent
+										</span>
+									)
+									: (
+										<span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-md font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">
+											Présent
+										</span>
+									)
+								}
+							</div>
+						</li>
+					))}
+				</ul>
+			)}
 		</div>
 	)
 }

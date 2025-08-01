@@ -272,9 +272,21 @@ export default function Page() {
 											{formatDate(dep.date)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											<span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-300">
-												{dep.statut}
-											</span>
+											{dep.statut === "EN_ATTENTE" && (
+												<span className="inline-flex animate-pulse px-2 py-1 text-xs text-gray-800 font-medium rounded-full bg-gray-300">
+													En attente
+												</span>
+											)}
+											{dep.statut === 'ACCEPTE' && (
+												<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
+													Dépense validée
+												</span>
+											)}
+											{dep.statut === 'REFUSE' && (
+												<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
+													Dépense refusée
+												</span>
+											)}
 										</td>
 									</tr>
 								))}

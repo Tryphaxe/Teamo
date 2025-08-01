@@ -45,6 +45,7 @@ model Employe {
   conges        Conge[]
   depenses      Depense[]
   departement   Departement @relation(fields: [departementId], references: [id])
+  Presenses     Presence[]
 }
 
 model Client {
@@ -93,6 +94,14 @@ model Vacance {
   nom       String
   dateDebut DateTime
   dateFin   DateTime
+}
+
+model Presence {
+  id        Int      @id @default(autoincrement())
+  employeId Int
+  date      DateTime @default(now())
+  present   Boolean
+  employe   Employe  @relation(fields: [employeId], references: [id])
 }
 
 enum StatutDepense {

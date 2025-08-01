@@ -152,9 +152,6 @@ export default function Page() {
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Statut
 									</th>
-									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Actions
-									</th>
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
@@ -192,11 +189,6 @@ export default function Page() {
 											{formatDate(dep.date)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											<span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-300">
-												{dep.statut}
-											</span>
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 											{dep.statut === "EN_ATTENTE" && (
 												<div className="flex gap-2">
 													<button
@@ -215,11 +207,15 @@ export default function Page() {
 													</button>
 												</div>
 											)}
-											{dep.statut === 'VALIDE' && (
-												<p className="text-green-600 font-semibold mt-2">Dépense validée</p>
+											{dep.statut === 'ACCEPTE' && (
+											<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
+												Dépense validée
+											</span>
 											)}
 											{dep.statut === 'REFUSE' && (
-												<p className="text-red-600 font-semibold mt-2">Dépense refusée</p>
+											<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
+												Dépense refusée
+											</span>
 											)}
 										</td>
 									</tr>

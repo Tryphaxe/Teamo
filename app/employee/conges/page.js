@@ -277,9 +277,21 @@ export default function Page() {
 											{formatDate(cong.dateFin)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											<span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-300">
-												{cong.statut}
-											</span>
+											{cong.statut === "EN_ATTENTE" && (
+												<span className="inline-flex animate-pulse px-2 py-1 text-xs text-gray-800 font-medium rounded-full bg-gray-300">
+													En attente
+												</span>
+											)}
+											{cong.statut === 'VALIDE' && (
+												<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
+													Congé validée
+												</span>
+											)}
+											{cong.statut === 'REFUSE' && (
+												<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
+													Congé refusée
+												</span>
+											)}
 										</td>
 									</tr>
 								))}
