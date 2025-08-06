@@ -37,7 +37,7 @@ export default function Page() {
 		fetchDepenses(setDepenses, setIsLoading);
 		fetchConges(setConges, setIsLoading);
 		fetchPresence();
-	}, [selectedDate]);
+	}, []);
 
 	//  Récupération count
 	const totalEmployes = employes.length;

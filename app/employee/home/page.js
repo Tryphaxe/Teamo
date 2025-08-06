@@ -106,11 +106,11 @@ export default function Page() {
 							<span className="px-10 bg-gray-200 rounded animate-pulse w-full h-6"></span>
 						) : stat === true ? (
 							<span className="w-full h-6 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset">
-								Vous avez marqué votre présence  "Présent" !
+								Vous avez marqué votre présence  <b>Présent</b> !
 							</span>
 						) : stat === false ? (
 							<span className="w-full h-6 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-red-600/10 ring-inset">
-								Vous avez marqué votre présence  "Absent" !
+								Vous avez marqué votre présence  <b>Absent</b> !
 							</span>
 						) : (
 							<span className="w-full h-6 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">
