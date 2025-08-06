@@ -1,15 +1,42 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { Calendar, Check, Receipt, User, UserRoundPen, X } from 'lucide-react';
-import { submitPresence } from "@/lib/api/apiPresence";
-import { formatDate } from '@/lib/date';
+import toast from 'react-hot-toast';
+import { Calendar, Check, Loader2, Receipt, User, UserRoundPen, X } from 'lucide-react';
+import { formatDate, getFormattedDate } from '@/lib/date';
+import { checkPresence, submitPresence } from '@/lib/api/apiPresence';
 
 
 export default function Page() {
 	const [user, setUser] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const today = new Date();
+	const todayStr = getFormattedDate(today);
+	const [stat, setStat] = useState(undefined);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await checkPresence(todayStr);
+			setStat(result);
+		};
+
+		fetchData();
+	}, [todayStr]);
+
+	const handleSubmit = async (present) => {
+		setIsLoading(true);
+		const toastId = toast.loading("Validation en cours...");
+		try {
+			await submitPresence(present);
+			toast.success(`Vous êtes noté : ${present}`, { id: toastId });
+		} catch (error) {
+			toast.error("Erreur lors de la soumission de la présence...", { id: toastId });
+			console.error('Erreur lors de la soumission de la présence :', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	useEffect(() => {
 		fetch('/api/auth/currentUser')
@@ -66,7 +93,6 @@ export default function Page() {
 				</div>
 			</div>
 
-			{/* Mes dépenses */}
 			<div className="bg-white rounded-xl border border-gray-200">
 				<div className="p-3 border-b border-gray-200">
 					<div className="flex items-center justify-between">
@@ -74,29 +100,59 @@ export default function Page() {
 					</div>
 				</div>
 
-				<div className="p-3">
-						<div className="grid grid-cols-2">
-							<div className='flex items-center gap-x-2 text-orange-500 text-2xl font-bold'>
-								<Calendar className='text-orange-900 w-4 h-4' />
-								<p>{formatDate(today)}</p>
-							</div>
-							<form className="flex items-center justify-between sm:justify-end gap-x-2">
-								<button
-									onClick={() => submitPresence(true)}
-									className="flex items-center text-md gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-								>
-									<Check className="w-5 h-5" />
-									Présent
-								</button>
-								<button
-									onClick={() => submitPresence(false)}
-									className="flex items-center text-md gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-								>
-									<X className="w-5 h-5" />
-									Absent
-								</button>
-							</form>
+				<div className="p-3 space-y-3">
+					<div className='w-full flex items-center'>
+						{loading ? (
+							<span className="px-10 bg-gray-200 rounded animate-pulse w-full h-6"></span>
+						) : stat === true ? (
+							<span className="w-full h-6 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset">
+								Vous avez marqué votre présence  "Présent" !
+							</span>
+						) : stat === false ? (
+							<span className="w-full h-6 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-red-600/10 ring-inset">
+								Vous avez marqué votre présence  "Absent" !
+							</span>
+						) : (
+							<span className="w-full h-6 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">
+								Vous n’avez pas encore marqué votre présence.
+							</span>
+						)}
+					</div>
+
+					<div className="flex items-center justify-between">
+						<div className='flex items-center gap-x-2 text-orange-500 text-lg sm:text-2xl font-bold'>
+							<Calendar className='text-orange-900 w-4 h-4' />
+							<p>{formatDate(todayStr)}</p>
 						</div>
+						<form className="flex items-center justify-between sm:justify-end gap-x-2">
+							<button
+								type="button"
+								onClick={() => handleSubmit(true)}
+								disabled={stat !== undefined}
+								className={`flex items-center text-md gap-1 px-3 py-1 rounded-lg transition-colors ${stat !== undefined
+										? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+										: 'bg-green-100 text-green-700 hover:bg-green-200'
+									}`}
+							>
+								<Check className="w-5 h-5" />
+								Présent
+							</button>
+
+							<button
+								type="button"
+								onClick={() => handleSubmit(false)}
+								disabled={stat !== undefined}
+								className={`flex items-center text-md gap-1 px-3 py-1 rounded-lg transition-colors ${stat !== undefined
+										? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+										: 'bg-red-100 text-red-700 hover:bg-red-200'
+									}`}
+							>
+								<X className="w-5 h-5" />
+								Absent
+							</button>
+
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
