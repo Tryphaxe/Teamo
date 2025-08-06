@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Users, Calendar, AlertCircle, Search, ListFilter, User, Timer, Radius, Info, RefreshCw } from 'lucide-react';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/20/solid'
@@ -21,7 +21,7 @@ export default function Page() {
 	const today = format(new Date(), 'yyyy-MM-dd');
 
 	// fetch présence
-	const fetchPresence = async () => {
+	const fetchPresence = useCallback(async () => {
 		try {
 			const res = await fetch(`/api/presences?date=${selectedDate}`);
 			const data = await res.json();
@@ -29,7 +29,7 @@ export default function Page() {
 		} catch (error) {
 			console.error('Erreur lors du chargement des présences :', error);
 		}
-	};
+	}, [selectedDate]);
 
 	//  Récupération fetch
 	useEffect(() => {
@@ -37,7 +37,7 @@ export default function Page() {
 		fetchDepenses(setDepenses, setIsLoading);
 		fetchConges(setConges, setIsLoading);
 		fetchPresence();
-	}, []);
+	}, [fetchPresence]);
 
 	//  Récupération count
 	const totalEmployes = employes.length;

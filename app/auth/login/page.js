@@ -19,16 +19,14 @@ export default function LoginPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true);
-
+		const toastId = toast.loading("Connexion en cours...");
 		try {
 			const res = await axios.post('/api/auth/login', { email, password });
 			console.log('API response:', res.data);
 			if (res.status === 200 && res.data?.role) {
-				toast.success('Connexion réussie !');
-
+				
 				const role = res.data.role;
-				console.log('User role:', role);
-
+				
 				if (role === 'ADMIN') {
 					router.push('/dashboard/home');
 				} else if (role === 'EMPLOYE') {
@@ -39,9 +37,10 @@ export default function LoginPage() {
 			} else {
 				toast.error('Échec de la connexion.');
 			}
+			toast.success('Connexion réussie !', {id: toastId});
 		} catch (err) {
-			toast.error(err.message);
-			setError(err.message);
+			// toast.error(err.message);
+			setError("Email ou mot de passe incorrecte");
 		} finally {
 			setLoading(false);
 		}
