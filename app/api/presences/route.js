@@ -45,8 +45,7 @@ export async function GET(req) {
 export async function POST(req) {
 	const body = await req.json();
 	const { pres } = body;
-	
-	// 1. Lire le token dans les cookies
+
 	const cookieStore = await cookies();
 	const token = cookieStore.get('token')?.value;
 
@@ -56,21 +55,29 @@ export async function POST(req) {
 
 	let decoded;
 	try {
-		// 2. Vérifier le token
 		decoded = jwt.verify(token, JWT_SECRET);
 	} catch (error) {
 		return NextResponse.json({ error: 'Token invalide' }, { status: 403 });
 	}
 
 	const employeId = decoded.id;
-	
-	const now = new Date();
-	const today =new Date(now.setHours(0, 0, 0, 0));
+
+	const now = new Date(); // 📌 garde l’heure ici
+
+	// Chercher s’il y a déjà une présence pour aujourd’hui
+	const startOfDay = new Date();
+	startOfDay.setHours(0, 0, 0, 0);
+
+	const endOfDay = new Date();
+	endOfDay.setHours(23, 59, 59, 999);
 
 	const existing = await prisma.presence.findFirst({
 		where: {
 			employeId,
-			date: today,
+			date: {
+				gte: startOfDay,
+				lte: endOfDay,
+			},
 		},
 	});
 
@@ -80,7 +87,7 @@ export async function POST(req) {
 
 	const presence = await prisma.presence.create({
 		data: {
-			date: today,
+			date: now,
 			present: pres,
 			employeId,
 		},

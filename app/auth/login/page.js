@@ -35,11 +35,11 @@ export default function LoginPage() {
 					toast.error('Rôle inconnu');
 				}
 			} else {
-				toast.error('Échec de la connexion.');
+				toast.error('Échec de la connexion.', {id: toastId});
 			}
 			toast.success('Connexion réussie !', {id: toastId});
 		} catch (err) {
-			// toast.error(err.message);
+			toast.error('Échec de la connexion.', {id: toastId});
 			setError("Email ou mot de passe incorrecte");
 		} finally {
 			setLoading(false);

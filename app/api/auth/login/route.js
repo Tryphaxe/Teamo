@@ -38,7 +38,7 @@ export async function POST(req) {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 1 jour
       path: '/',
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     // Réponse avec le cookie + rôle à la racine

@@ -9,6 +9,7 @@ import { fetchDepenses } from '@/lib/api/apiDepense';
 import { fetchConges } from '@/lib/api/apiConge';
 import { formatDate, getFormattedDate, getHeureFromDate } from '@/lib/date';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function Page() {
 	const [employes, setEmployes] = useState([]);
@@ -16,18 +17,22 @@ export default function Page() {
 	const [conges, setConges] = useState([]);
 	const [presences, setPresences] = useState([]);
 	const [isloading, setIsLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedDate, setSelectedDate] = useState(getFormattedDate());
 	const today = format(new Date(), 'yyyy-MM-dd');
 
 	// fetch présence
 	const fetchPresence = useCallback(async () => {
+		setLoading(true);
 		try {
 			const res = await fetch(`/api/presences?date=${selectedDate}`);
 			const data = await res.json();
 			setPresences(data);
 		} catch (error) {
-			console.error('Erreur lors du chargement des présences :', error);
+			toast.error("Erreur chargement");
+		} finally {
+			setLoading(false);
 		}
 	}, [selectedDate]);
 
@@ -121,11 +126,11 @@ export default function Page() {
 					onClick={fetchPresence}
 					className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
 				>
-					<RefreshCw className="w-4 h-4" />
+					<RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
 				</button>
 			</div>
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 p-1">
 				<div>
 					<input
 						type="date"

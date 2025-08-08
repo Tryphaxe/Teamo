@@ -28,12 +28,16 @@ export async function GET(req) {
 	const employeId = decoded.id;
 
 	const date = parseISO(dateStr);
-	const dateZ = new Date(date.setHours(0, 0, 0, 0));
-
+	// Chercher s’il y a déjà une présence pour aujourd’hui
+	const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+	const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 	const presence = await prisma.presence.findFirst({
 		where: {
 			employeId,
-			date: dateZ,
+			date: {
+				gte: startOfDay,
+				lte: endOfDay,
+			},
 		},
 	});
 
