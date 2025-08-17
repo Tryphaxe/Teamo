@@ -5,7 +5,10 @@ import bcrypt from 'bcryptjs';
 // GET tous les employés
 export async function GET() {
   try {
-    const employes = await prisma.employe.findMany({
+    const employes = await prisma.user.findMany({
+      where: {
+        role: "EMPLOYE",
+      },
       include: {
         departement: true,
       },
@@ -44,7 +47,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
 
-    const existing = await prisma.employe.findUnique({
+    const existing = await prisma.user.findUnique({
       where: { email: email },
     });
 
@@ -54,7 +57,7 @@ export async function POST(request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const employe = await prisma.employe.create({
+    const employe = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,

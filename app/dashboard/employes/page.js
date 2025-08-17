@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search, Check, ChevronsDownUp, ListFilter } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search, ListFilter, Eye, CloudUpload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios'
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid'
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react'
+import { CheckIcon } from '@heroicons/react/20/solid'
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
@@ -17,6 +17,14 @@ export default function Page() {
 	const [editMode, setEditMode] = useState(false);
 	const [selectedEmploye, setSelectedEmploye] = useState(null);
 	const [searchTerm, setSearchTerm] = useState('');
+	const [pdfs, setPdfs] = useState([]);
+
+	const handleFileChange = (e) => {
+		const selectedFiles = Array.from(e.target.files);
+		const pdfFiles = selectedFiles.filter(file => file.type === 'application/pdf');
+
+		setPdfs(pdfFiles);
+	};
 
 	const [form, setForm] = useState({
 		email: '',
@@ -156,7 +164,7 @@ export default function Page() {
 					</h3>
 					<form onSubmit={handleSubmit} className="space-y-4 text-black">
 						<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 mb-4 text-orange-600 text-xl">
-							<span className='uppercase'>Informations deptnelles</span>
+							<span className='uppercase'>Informations personnelles</span>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
@@ -321,6 +329,53 @@ export default function Page() {
 								/>
 							</div>
 						</div>
+						<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 mb-4 text-orange-600 text-xl">
+							<span className='uppercase'>Documents associés</span>
+						</div>
+						<div className="flex-1 items-center max-w-screen-sm mx-auto mb-3 space-y-4 sm:flex sm:space-y-0">
+							<div className="relative w-full">
+								<div className="items-center justify-center max-w-xl mx-auto">
+									<label className="flex justify-center w-full h-32 px-4 transition 
+											bg-white border-2 border-gray-300 border-dashed rounded-md 
+											appearance-none cursor-pointer hover:border-gray-400 
+											focus:outline-none" id="drop">
+										<span className="flex items-center space-x-2">
+											<CloudUpload size={20} color="#8d8d8dff" />
+											<span className="font-medium text-gray-600">
+												Drop des fichiers PDF ou
+												<span className="text-blue-600 underline ml-[4px]">parcourir</span>
+											</span>
+										</span>
+										<input
+											type="file"
+											name="file_upload"
+											className="hidden"
+											accept="application/pdf"
+											multiple
+											id="input"
+											onChange={handleFileChange}
+										/>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						{/* Affichage des fichiers PDF */}
+						<div className="max-w-xl mx-auto mt-4 space-y-2">
+							{pdfs.map((pdf, index) => (
+								<div key={index} className="flex items-center justify-between px-4 py-2 bg-orange-50 rounded">
+									<span className="text-gray-700 truncate">{pdf.name}</span>
+									<a
+										href={URL.createObjectURL(pdf)}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-blue-600 underline text-sm"
+									>
+										<Eye size={20} color="#2c2c2cff" />
+									</a>
+								</div>
+							))}
+						</div>
 						<div className="flex gap-2">
 							<button
 								type="submit"
@@ -450,9 +505,6 @@ export default function Page() {
 										Genre
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Date de naissance
-									</th>
-									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Téléphone
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -465,13 +517,7 @@ export default function Page() {
 										Département
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Salaire
-									</th>
-									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Date d&apos;embauche
-									</th>
-									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-										Mot de passe
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Actions
@@ -496,9 +542,6 @@ export default function Page() {
 											{emp.genre === 'M' ? 'M' : emp.genre === 'F' ? 'F' : emp.genre}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{formatDate(emp.dateNaissance)}
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{emp.telephone || 'Non renseigné'}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -511,16 +554,15 @@ export default function Page() {
 											{emp.departement.nom}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{emp.salaire} FCFA
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{formatDate(emp.dateEntree)}
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											********
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 											<div className="flex gap-2">
+												<button
+													className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+												>
+													<Eye className="w-4 h-4" />
+												</button>
 												<button
 													onClick={() => {
 														setForm(emp);
@@ -528,7 +570,7 @@ export default function Page() {
 														setSelectedEmploye(emp);
 														setShowForm(true);
 													}}
-													className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+													className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
 												>
 													<Edit className="w-4 h-4" />
 												</button>

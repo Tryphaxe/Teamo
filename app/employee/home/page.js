@@ -39,13 +39,13 @@ export default function Page() {
 
 	const handleSubmit = async (present) => {
 		setIsLoading(true);
-		const toastId = toast.loading("Validation en cours...");
+		const toastt = toast.loading("Validation en cours...");
 		try {
 			await submitPresence(present);
 			fetchData();
-			toast.success(`Vous êtes noté : ${present === true ? "Présent" : "Absent"}`, { id: toastId });
+			toast.success(`Vous êtes noté : ${present === true ? "Présent" : "Absent"}`, { id: toastt });
 		} catch (error) {
-			toast.error("Erreur lors de la soumission de la présence...", { id: toastId });
+			toast.error("Erreur lors de la soumission de la présence...", { id: toastt });
 			console.error('Erreur lors de la soumission de la présence :', error);
 		} finally {
 			setIsLoading(false);
@@ -56,7 +56,7 @@ export default function Page() {
 		<div className='space-y-3'>
 			{/* En-tête de bienvenue */}
 			<div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-				<h1 className="text-2xl font-bold mb-2">Bonjour, {loading ? (<span className="text-sm animate-pulse">###</span>) : user ? user.nom : ' '}</h1>
+				<h1 className="text-2xl font-bold mb-2">Bonjour, {loading ? (<span className="px-10 ml-2 bg-blue-200 rounded-full animate-pulse w-full"></span>) : user ? user.nom : ' '}</h1>
 				<p className="text-blue-100">Voici un aperçu de votre espace personnel</p>
 			</div>
 

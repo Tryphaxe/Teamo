@@ -31,26 +31,50 @@ export default function Header() {
 	const router = useRouter()
 
 	useEffect(() => {
+		const toast2 = toast.loading("Vérification de la session...");
+
 		fetch('/api/auth/currentUser')
-			.then(res => res.json())
-			.then(data => {
+			.then(async (res) => {
+				if (!res.ok) {
+					if (res.status === 401) {
+						toast.error("Votre session a expiré. Veuillez vous reconnecter.", { id: toast2 });
+					} else {
+						toast.error("Impossible de récupérer votre session.", { id: toast2 });
+					}
+					setUser(null);
+					setLoading(false);
+					return;
+				}
+
+				const data = await res.json();
+
+				if (!data.user) {
+					toast.error("Vous êtes resté inactif trop longtemps.", { id: toast2 });
+				} else {
+					toast.success("Session active ✅", { id: toast2 });
+				}
+
 				setUser(data.user);
+				setLoading(false);
+			})
+			.catch(() => {
+				toast.error("Erreur de connexion au serveur.", { id: toast2 });
 				setLoading(false);
 			});
 	}, []);
 
 	const handleLogout = async () => {
-		const toastId = toast.loading('Déconnexion en cours...');
+		const toast3 = toast.loading('Déconnexion en cours...');
 		try {
 			const res = await fetch('/api/auth/logout', { method: 'GET' });
 			if (res.ok) {
-				toast.success('Déconnexion réussie', { id: toastId });
+				toast.success('Déconnexion réussie', { id: toast3 });
 				router.push('/auth/login');
 			} else {
-				toast.error('Échec de la déconnexion', { id: toastId });
+				toast.error('Échec de la déconnexion', { id: toast3 });
 			}
 		} catch (error) {
-			toast.error('Une erreur est survenue', { id: toastId });
+			toast.error('Une erreur est survenue', { id: toast3 });
 		}
 	};
 
@@ -69,13 +93,13 @@ export default function Header() {
 							/>
 							<span className='text-blue-600 font-bold text-xl sm:block hidden'>Teamo</span>
 							<div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-								<div className="text-right flex items-center justify-center">
-									<p className="text-sm font-medium text-gray-900">
-										{loading ? (<span className="text-sm animate-pulse">Wait...</span>) : user ? user.nom : 'Non connecté'}
-									</p>
+								<div className="text-sm font-medium text-gray-900 flex items-center justify-center">
+									{loading ? (<span className="px-10 h-6 bg-blue-100 rounded-md animate-pulse w-full"></span>) : user ? (user.nom) : 'Non connecté'}
 								</div>
-								<div className="bg-blue-100 px-3 py-1 rounded-full flex items-center justify-center">
-									<p className="text-sm text-black capitalize">{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.poste : 'Employé'}</p>
+								<div className="bg-blue-100 px-3 py-1 rounded-md flex items-center justify-center">
+									<p className="text-sm text-black capitalize">
+										{loading ? (<span className="px-10 bg-blue-100 rounded-lg animate-pulse w-full"></span>) : user ? user.poste : 'Employé'}
+									</p>
 								</div>
 							</div>
 						</div>
@@ -93,9 +117,9 @@ export default function Header() {
 									<MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800">
 										<span className="absolute -inset-1.5" />
 										<span className="sr-only">Open user menu</span>
-										<div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-											<span className="text-sm font-medium text-teal-700">
-												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? (user.nom + " " + user.prenom).split(' ').map(n => n[0]).join('') : 'X'}
+										<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+											<span className="text-sm font-medium text-blue-700 flex items-center justify-center over">
+												{loading ? (<span className="absolute inline-flex size-3 animate-ping rounded-full bg-blue-100 opacity-75"></span>) : user ? (user.nom + " " + user.prenom).split(' ').map(n => n[0]).join('') : 'X'}
 											</span>
 										</div>
 									</MenuButton>

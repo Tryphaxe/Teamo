@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-// GET tous les employés
+// GET tous les admins
 export async function GET() {
   try {
-    const admins = await prisma.administrateur.findMany({
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
       orderBy: {
         createdAt: 'desc',
       },
@@ -18,7 +19,7 @@ export async function GET() {
   }
 }
 
-// POST créer un employé
+// POST créer un admin
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -33,8 +34,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
 
-    const existing = await prisma.administrateur.findUnique({
-      where: { email: email },
+    const existing = await prisma.user.findUnique({
+      where: { email },
     });
 
     if (existing) {
@@ -43,12 +44,13 @@ export async function POST(request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = await prisma.administrateur.create({
+    const admin = await prisma.user.create({
       data: {
         nom,
         prenom,
         email,
         password: hashedPassword,
+        role: 'ADMIN',
       },
     });
 

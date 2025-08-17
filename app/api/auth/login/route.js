@@ -10,27 +10,16 @@ export async function POST(req) {
   try {
     const { email, password } = await req.json();
 
-    // Recherche dans les deux tables
-    const employe = await prisma.employe.findUnique({ where: { email } });
-    const admin = await prisma.administrateur.findUnique({ where: { email } });
+    // Recherche dans la table unique User
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    let user = null;
-    let role = null;
-
-    if (employe && await bcrypt.compare(password, employe.password)) {
-      user = employe;
-      role = 'EMPLOYE';
-    } else if (admin && await bcrypt.compare(password, admin.password)) {
-      user = admin;
-      role = 'ADMIN';
-    }
-
-    if (!user) {
+    // Vérification si l'utilisateur existe et que le mot de passe est correct
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
     }
 
-    // Génération du token JWT
-    const token = jwt.sign({ id: user.id, role }, JWT_SECRET, { expiresIn: '1d' });
+    // Génération du token JWT avec le rôle venant de la DB
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
 
     // Création du cookie
     const cookie = serialize('token', token, {
@@ -41,10 +30,10 @@ export async function POST(req) {
       sameSite: 'lax',
     });
 
-    // Réponse avec le cookie + rôle à la racine
+    // Réponse avec le cookie + rôle
     const response = NextResponse.json({
       message: 'Connexion réussie',
-      role, // ⬅️ Ajout du rôle ici directement
+      role: user.role,
       user: {
         id: user.id,
         nom: user.nom,

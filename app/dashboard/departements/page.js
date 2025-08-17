@@ -49,6 +49,7 @@ export default function Page() {
 								</label>
 								<input
 									type="text"
+									name="nom"
 									id="nom"
 									value={form.nom} onChange={handleChange}
 									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"

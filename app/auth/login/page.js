@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -14,19 +14,25 @@ export default function LoginPage() {
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	useEffect(() => {
+		if (searchParams.get('session') === 'expired') {
+			toast.error("Votre session a expiré. Merci de vous reconnecter.");
+		}
+	}, [searchParams]);
 
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true);
-		const toastId = toast.loading("Connexion en cours...");
+		const toat1 = toast.loading("Connexion en cours...");
 		try {
 			const res = await axios.post('/api/auth/login', { email, password });
-			console.log('API response:', res.data);
 			if (res.status === 200 && res.data?.role) {
-				
+
 				const role = res.data.role;
-				
+
 				if (role === 'ADMIN') {
 					router.push('/dashboard/home');
 				} else if (role === 'EMPLOYE') {
@@ -35,11 +41,11 @@ export default function LoginPage() {
 					toast.error('Rôle inconnu');
 				}
 			} else {
-				toast.error('Échec de la connexion.', {id: toastId});
+				toast.error('Échec de la connexion.', { id: toat1 });
 			}
-			toast.success('Connexion réussie !', {id: toastId});
+			toast.success('Connexion réussie !', { id: toat1 });
 		} catch (err) {
-			toast.error('Échec de la connexion.', {id: toastId});
+			toast.error('Échec de la connexion.', { id: toat1 });
 			setError("Email ou mot de passe incorrecte");
 		} finally {
 			setLoading(false);

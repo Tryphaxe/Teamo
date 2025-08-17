@@ -7,45 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Administrateur {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  nom       String
-  prenom    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  role      String   @default("ADMIN")
-}
-
-model Departement {
-  id        Int       @id @default(autoincrement())
-  nom       String    @unique
-  createdAt DateTime  @default(now())
-  employes  Employe[]
-}
-
-model Employe {
-  id            Int         @id @default(autoincrement())
-  email         String      @unique
+model User {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique
   password      String
   nom           String
   prenom        String
-  departementId Int
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  dateEntree    DateTime    @default(now())
-  dateNaissance DateTime
-  poste         String
-  salaire       Float
+  role          Role          @default(EMPLOYE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Champs spécifiques employés (nullable pour les admins)
+  departementId Int?
+  dateEntree    DateTime?     @default(now())
+  dateNaissance DateTime?
+  poste         String?
+  salaire       Float?
   adresse       String?
   genre         String?
   telephone     String?
-  role          String      @default("EMPLOYE")
+
+  // Relations
+  departement   Departement?  @relation(fields: [departementId], references: [id])
   conges        Conge[]
   depenses      Depense[]
-  departement   Departement @relation(fields: [departementId], references: [id])
-  Presenses     Presence[]
+  presences     Presence[]
+}
+
+model Departement {
+  id        Int      @id @default(autoincrement())
+  nom       String   @unique
+  createdAt DateTime @default(now())
+  employes  User[]
 }
 
 model Client {
@@ -73,7 +66,7 @@ model Depense {
   statut      StatutDepense @default(EN_ATTENTE)
   date        DateTime      @default(now())
   createdAt   DateTime      @default(now())
-  employe     Employe       @relation(fields: [employeId], references: [id])
+  employe     User          @relation(fields: [employeId], references: [id])
   projet      Projet        @relation(fields: [projetId], references: [id])
 }
 
@@ -86,7 +79,7 @@ model Conge {
   statut    StatutConge @default(EN_ATTENTE)
   raison    String?
   createdAt DateTime    @default(now())
-  employe   Employe     @relation(fields: [employeId], references: [id])
+  employe   User        @relation(fields: [employeId], references: [id])
 }
 
 model Vacance {
@@ -101,7 +94,13 @@ model Presence {
   employeId Int
   date      DateTime @default(now())
   present   Boolean
-  employe   Employe  @relation(fields: [employeId], references: [id])
+  employe   User     @relation(fields: [employeId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  COMPT
+  EMPLOYE
 }
 
 enum StatutDepense {

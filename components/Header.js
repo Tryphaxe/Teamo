@@ -52,17 +52,17 @@ export default function Header() {
 
 
 	const handleLogout = async () => {
-		const toastId = toast.loading('Déconnexion en cours...');
+		const toast6 = toast.loading('Déconnexion en cours...');
 		try {
 			const res = await fetch('/api/auth/logout', { method: 'GET' });
 			if (res.ok) {
-				toast.success('Déconnexion réussie', { id: toastId });
+				toast.success('Déconnexion réussie', { id: toast6 });
 				router.push('/auth/login');
 			} else {
-				toast.error('Échec de la déconnexion', { id: toastId });
+				toast.error('Échec de la déconnexion', { id: toast6 });
 			}
 		} catch (error) {
-			toast.error('Une erreur est survenue', { id: toastId });
+			toast.error('Une erreur est survenue', { id: toast6 });
 		}
 	};
 

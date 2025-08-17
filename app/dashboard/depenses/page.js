@@ -61,54 +61,45 @@ export default function Page() {
 				</div>
 			</div>
 
-			<div className="flex items-center justify-between mb-3">
-				<Listbox value={selectedStatus} onChange={setSelectedStatus}>
-					<div className="relative text-black">
-						<ListboxButton className="flex items-center cursor-pointer gap-2 font-medium px-3 py-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6">
-							<ListFilter size={20} color="#333" />
-							Statut
-						</ListboxButton>
-
-						<ListboxOptions
-							transition
-							className="absolute z-10 mt-1 max-h-56 min-w-max overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
-						>
-							{filtresDepenses.map((statut) => (
-								<ListboxOption
-									key={statut.id ?? 'all'}
-									value={statut}
-									className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-blue-600 data-focus:text-white data-focus:outline-hidden"
-								>
-									<div className="flex items-center min-w-max">
-										<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{statut.nom}</span>
-									</div>
-									<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-not-data-selected:hidden group-data-focus:text-white">
-										<CheckIcon aria-hidden="true" className="size-5" />
-									</span>
-								</ListboxOption>
-							))}
-						</ListboxOptions>
-					</div>
-				</Listbox>
-
-				<button
-					onClick={() => setShowForm(true)}
-					className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-				>
-					<Plus className="w-4 h-4" />
-					Ajouter
-				</button>
-			</div>
-
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="p-3 border-b border-gray-200 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900">Liste des dépenses</h3>
-					<button
-						onClick={() => setShowForm(true)}
-						className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
-					>
-						<Upload className="w-4 h-4" />
-					</button>
+					<div className='flex items-center justify-center gap-3'>
+						<Listbox value={selectedStatus} onChange={setSelectedStatus}>
+							<div className="relative text-black">
+								<ListboxButton className="flex items-center cursor-pointer gap-2 font-medium px-3 py-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6">
+									<ListFilter size={20} color="#333" />
+									Statut
+								</ListboxButton>
+
+								<ListboxOptions
+									transition
+									className="absolute z-10 mt-1 max-h-56 min-w-max overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
+								>
+									{filtresDepenses.map((statut) => (
+										<ListboxOption
+											key={statut.id ?? 'all'}
+											value={statut}
+											className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-blue-600 data-focus:text-white data-focus:outline-hidden"
+										>
+											<div className="flex items-center min-w-max">
+												<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{statut.nom}</span>
+											</div>
+											<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-not-data-selected:hidden group-data-focus:text-white">
+												<CheckIcon aria-hidden="true" className="size-5" />
+											</span>
+										</ListboxOption>
+									))}
+								</ListboxOptions>
+							</div>
+						</Listbox>
+						<button
+							onClick={() => setShowForm(true)}
+							className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
+						>
+							<Upload className="w-4 h-4" />
+						</button>
+					</div>
 				</div>
 				<div className="overflow-x-auto custom-scrollbar">
 					{isloading ? (
@@ -122,13 +113,6 @@ export default function Page() {
 								<Info className='w-4 h-4 text-red-800' />
 								<span className="ml-2 text-gray-700">Aucun département trouvé</span>
 							</div>
-							<button
-								onClick={() => setShowForm(true)}
-								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-							>
-								<Plus className="w-4 h-4" />
-								Ajouter
-							</button>
 						</div>
 					) : (
 						<table className="w-full">
@@ -208,14 +192,14 @@ export default function Page() {
 												</div>
 											)}
 											{dep.statut === 'ACCEPTE' && (
-											<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
-												Dépense validée
-											</span>
+												<span className="inline-flex px-2 py-1 text-xs text-green-800 font-medium rounded-full bg-green-300">
+													Dépense validée
+												</span>
 											)}
 											{dep.statut === 'REFUSE' && (
-											<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
-												Dépense refusée
-											</span>
+												<span className="inline-flex px-2 py-1 text-xs text-red-800 font-medium rounded-full bg-red-300">
+													Dépense refusée
+												</span>
 											)}
 										</td>
 									</tr>

@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-
 export async function DELETE(request, { params }) {
   const id = parseInt(params.id);
 
   try {
-    await prisma.administrateur.delete({
+    await prisma.user.delete({
       where: { id },
     });
 
