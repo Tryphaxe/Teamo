@@ -11,6 +11,7 @@ export async function GET() {
       },
       include: {
         departement: true,
+        files: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -38,12 +39,17 @@ export async function POST(request) {
       genre,
       dateNaissance,
       dateEntree,
+      dateSortie,
       poste,
       salaire,
-      departementId
+      departementId,
+      files, // ✅ on l’ajoute ici
     } = body;
 
-    if (!email || !password || !nom || !prenom || !dateNaissance || !dateEntree || !poste || !salaire || !departementId) {
+    if (
+      !email || !password || !nom || !prenom || !dateNaissance ||
+      !dateEntree || !dateSortie || !poste || !salaire || !departementId
+    ) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
 
@@ -68,11 +74,23 @@ export async function POST(request) {
         genre,
         dateNaissance: new Date(dateNaissance),
         dateEntree: new Date(dateEntree),
+        dateSortie: new Date(dateSortie),
         poste,
         salaire: parseFloat(salaire),
         departementId: parseInt(departementId),
       },
     });
+
+    // ✅ Ajout des fichiers liés (si présents)
+    if (files && files.length > 0) {
+      await prisma.userFile.createMany({
+        data: files.map(doc => ({
+          name: doc.name,
+          url: doc.url,
+          userId: employe.id, // ✅ ici c’est employe.id
+        }))
+      });
+    }
 
     return NextResponse.json(employe, { status: 201 });
   } catch (error) {

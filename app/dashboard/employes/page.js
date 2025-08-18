@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search, ListFilter, Eye, CloudUpload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios'
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react'
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 import { CheckIcon } from '@heroicons/react/20/solid'
+import { supabase } from '@/lib/supabase';
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
@@ -18,6 +20,8 @@ export default function Page() {
 	const [selectedEmploye, setSelectedEmploye] = useState(null);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [pdfs, setPdfs] = useState([]);
+	const [selectedDetails, setSelectedDetails] = useState(null);
+	const [showDrawer, setShowDrawer] = useState(false);
 
 	const handleFileChange = (e) => {
 		const selectedFiles = Array.from(e.target.files);
@@ -36,6 +40,7 @@ export default function Page() {
 		genre: '',
 		dateNaissance: '',
 		dateEntree: '',
+		dateSortie: '',
 		poste: '',
 		salaire: '',
 		departementId: '',
@@ -90,13 +95,58 @@ export default function Page() {
 	// Fonction pour enregistrer un nouvel employé
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
+		setLoading(true);
 		const toastId = toast.loading(editMode ? "Mise à jour de l’employé..." : "Enregistrement de l’employé...");
+
 		try {
+			let uploadedFiles = [];
+			const sanitizeFileName = (name) =>
+				name.normalize("NFD") // enlève les accents
+					.replace(/[\u0300-\u036f]/g, "") // supprime les diacritiques
+					.replace(/[^a-zA-Z0-9._-]/g, "_"); // remplace les caractères spéciaux par _
+
+			// 📁 Upload des fichiers PDF dans Supabase Storage
+			if (pdfs.length > 0) {
+				for (const file of pdfs) {
+
+
+					// Exemple d’utilisation :
+					const safeFileName = sanitizeFileName(file.name);
+					const filePath = `employes/${sanitizeFileName(form.nom)}_${sanitizeFileName(form.prenom)}/${Date.now()}_${safeFileName}`;
+					const { data, error } = await supabase.storage
+						.from("user-files")
+						.upload(filePath, file);
+
+					if (error) {
+						console.error(error);
+						toast.error(`Erreur lors de l'envoi du fichier ${file.name}`, { id: toastId });
+						continue;
+					}
+
+					// 📎 Récupérer l'URL publique
+					const { data: publicUrlData } = supabase
+						.storage
+						.from("user-files")
+						.getPublicUrl(filePath);
+
+					if (publicUrlData?.publicUrl) {
+						uploadedFiles.push({
+							name: file.name,
+							url: publicUrlData.publicUrl,
+						});
+					}
+
+				}
+			}
+
+			// 🗃️ Enregistrer l’employé + documents dans la base de données
 			const res = await fetch(editMode ? `/api/employes/${selectedEmploye.id}` : '/api/employes', {
 				method: editMode ? 'PUT' : 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(form),
+				body: JSON.stringify({
+					...form,
+					files: uploadedFiles, // <-- On ajoute les URLs ici
+				}),
 			});
 
 			const data = await res.json();
@@ -105,6 +155,7 @@ export default function Page() {
 				toast.error(data.error || "Erreur lors de l'enregistrement", { id: toastId });
 				return;
 			}
+
 			toast.success(editMode
 				? `Employé modifié avec succès.`
 				: `Employé ${data.nom} ${data.prenom} ajouté avec succès.`,
@@ -112,16 +163,21 @@ export default function Page() {
 			);
 
 			setForm(emptyForm);
+			setPdfs([]);
 			setShowForm(false);
-			fetchEmployes();
 			setEditMode(false);
 			setSelectedEmploye(null);
+			fetchEmployes();
 
 		} catch (err) {
-			toast.error('Erreur lors de l\'enregistrement.', { id: toastId })
+			console.error(err);
+			toast.error('Erreur lors de l\'enregistrement.', { id: toastId });
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
+	};
+	const removePdf = (index) => {
+		setPdfs(prev => prev.filter((_, i) => i !== index));
 	};
 
 	const formatDate = (dateStr) => {
@@ -138,6 +194,21 @@ export default function Page() {
 		const toastId = toast.loading('Suppression en cours...')
 
 		try {
+			if (employe.files && employe.files.length > 0) {
+				const filePaths = employe.files.map(file => {
+					// Supprime la partie publique de l'URL pour retrouver le chemin dans le bucket
+					const url = new URL(file.url);
+					return decodeURIComponent(url.pathname.replace(/^\/storage\/v1\/object\/public\//, ''));
+				});
+
+				const { error } = await supabase.storage
+					.from('user-files')
+					.remove(filePaths);
+
+				if (error) {
+					console.error('Erreur suppression fichiers storage :', error);
+				}
+			}
 			await axios.delete(`/api/employes/${id}`)
 			toast.success('Employé supprimé.', { id: toastId })
 			fetchEmployes() // Recharger la liste des employés
@@ -289,11 +360,23 @@ export default function Page() {
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Date d&apos;embauche
+									Date d&apos;entrée
 								</label>
 								<input
 									name="dateEntree"
 									value={form.dateEntree} onChange={handleChange}
+									type="date"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									required
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-black mb-1">
+									Date de sortie
+								</label>
+								<input
+									name="dateSortie"
+									value={form.dateSortie} onChange={handleChange}
 									type="date"
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
 									required
@@ -365,14 +448,23 @@ export default function Page() {
 							{pdfs.map((pdf, index) => (
 								<div key={index} className="flex items-center justify-between px-4 py-2 bg-orange-50 rounded">
 									<span className="text-gray-700 truncate">{pdf.name}</span>
-									<a
-										href={URL.createObjectURL(pdf)}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="text-blue-600 underline text-sm"
-									>
-										<Eye size={20} color="#2c2c2cff" />
-									</a>
+									<div className="flex items-center gap-2">
+										<a
+											href={URL.createObjectURL(pdf)}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-blue-600 underline text-sm"
+										>
+											<Eye size={20} />
+										</a>
+										<button
+											type="button"
+											onClick={() => removePdf(index)}
+											className="text-red-500 hover:text-red-700"
+										>
+											<Trash2 size={20} />
+										</button>
+									</div>
 								</div>
 							))}
 						</div>
@@ -559,6 +651,10 @@ export default function Page() {
 										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 											<div className="flex gap-2">
 												<button
+													onClick={() => {
+														setSelectedDetails(emp);
+														setShowDrawer(true);
+													}}
 													className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
 												>
 													<Eye className="w-4 h-4" />
@@ -589,6 +685,108 @@ export default function Page() {
 					)}
 				</div>
 			</div>
+
+			<Dialog open={showDrawer} onClose={setShowDrawer} className="relative z-50">
+				<DialogBackdrop
+					transition
+					className="fixed inset-0 bg-gray-900/50 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
+				/>
+
+				<div className="fixed inset-0 overflow-hidden">
+					<div className="absolute inset-0 overflow-hidden">
+						<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+							<DialogPanel
+								transition
+								className="pointer-events-auto relative w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+							>
+								<TransitionChild>
+									<div className="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 duration-500 ease-in-out data-closed:opacity-0 sm:-ml-10 sm:pr-4">
+										<button
+											type="button"
+											onClick={() => setShowDrawer(false)}
+											className="relative rounded-md text-gray-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+										>
+											<span className="absolute -inset-2.5" />
+											<span className="sr-only">Close panel</span>
+											<XMarkIcon aria-hidden="true" className="size-6" />
+										</button>
+									</div>
+								</TransitionChild>
+								<div className="relative flex h-full flex-col overflow-y-auto bg-gray-50 py-6 shadow-xl after:absolute after:inset-y-0 after:left-0 after:w-px after:bg-white/10">
+									<div className="px-4 sm:px-6">
+										<DialogTitle className="text-base font-semibold text-black">Toutes les informations</DialogTitle>
+									</div>
+									<div className="relative mt-6 flex-1 px-4 sm:px-6">
+										{showDrawer && selectedDetails && (
+											<div className="space-y-6 text-sm text-gray-800">
+
+												{/* Bloc : Informations personnelles */}
+												<div>
+													<h3 className="text-md font-semibold text-orange-600 mb-2 uppercase border-b border-gray-200 pb-1">Informations personnelles</h3>
+													<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+														<p><strong>Nom :</strong> {selectedDetails.nom}</p>
+														<p><strong>Prénom :</strong> {selectedDetails.prenom}</p>
+														<p><strong>Date de naissance :</strong> {formatDate(selectedDetails.dateNaissance)}</p>
+														<p><strong>Genre :</strong> {selectedDetails.genre}</p>
+														<p><strong>Téléphone :</strong> {selectedDetails.telephone}</p>
+														<p><strong>Adresse :</strong> {selectedDetails.adresse}</p>
+													</div>
+												</div>
+
+												{/* Bloc : Informations sur le poste */}
+												<div>
+													<h3 className="text-md font-semibold text-orange-600 mb-2 uppercase border-b border-gray-200 pb-1">Informations sur le poste</h3>
+													<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+														<p><strong>Poste :</strong> {selectedDetails.poste}</p>
+														<p><strong>Département :</strong> {selectedDetails.departement?.nom || 'Non renseigné'}</p>
+														<p><strong>Salaire :</strong> {selectedDetails.salaire} FCFA</p>
+														<p><strong>Date d’entrée :</strong> {formatDate(selectedDetails.dateEntree)}</p>
+														<p><strong>Date de sortie :</strong> {formatDate(selectedDetails.dateSortie)}</p>
+													</div>
+												</div>
+
+												{/* Bloc : Informations de connexion */}
+												<div>
+													<h3 className="text-md font-semibold text-orange-600 mb-2 uppercase border-b border-gray-200 pb-1">Informations de connexion</h3>
+													<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+														<p><strong>Email :</strong> {selectedDetails.email}</p>
+														<p><strong>Mot de passe :</strong>***********</p>
+														{/* Tu peux ajouter d’autres infos comme le rôle si besoin */}
+													</div>
+												</div>
+
+												{/* Bloc : Fichiers joints */}
+												<div>
+													<h3 className="text-md font-semibold text-orange-600 mb-2 uppercase border-b border-gray-200 pb-1">Documents</h3>
+													{selectedDetails.files?.length > 0 ? (
+														<ul className="space-y-2">
+															{selectedDetails.files.map((file, index) => (
+																<li key={index} className="flex justify-between items-center bg-orange-50 p-2 rounded border">
+																	<span className="truncate">{file.name}</span>
+																	<a
+																		href={file.url}
+																		target="_blank"
+																		rel="noopener noreferrer"
+																		className="text-blue-600 hover:underline text-sm"
+																	>
+																		Voir
+																	</a>
+																</li>
+															))}
+														</ul>
+													) : (
+														<p className="text-gray-500 text-sm">Aucun fichier enregistré.</p>
+													)}
+												</div>
+											</div>
+										)}
+									</div>
+								</div>
+							</DialogPanel>
+						</div>
+					</div>
+				</div>
+			</Dialog>
 		</div>
 	)
 }

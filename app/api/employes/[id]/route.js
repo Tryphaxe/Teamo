@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 export async function GET(_, { params }) {
-  const employe = await prisma.employe.findUnique({
+  const employe = await prisma.user.findUnique({
     where: { id: params.id },
   });
   return NextResponse.json(employe);
@@ -13,7 +13,7 @@ export async function PUT(req, { params }) {
   const data = await req.json();
 
   try {
-    const employe = await prisma.employe.update({
+    const employe = await prisma.user.update({
       where: { id: parseInt(id) },
       data,
     });
@@ -27,7 +27,7 @@ export async function DELETE(request, { params }) {
   const id = parseInt(params.id);
 
   try {
-    await prisma.employe.delete({
+    await prisma.user.delete({
       where: { id },
     });
 

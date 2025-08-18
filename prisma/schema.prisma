@@ -8,18 +8,19 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  email         String        @unique
-  password      String
-  nom           String
-  prenom        String
-  role          Role          @default(EMPLOYE)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  nom       String
+  prenom    String
+  role      Role     @default(EMPLOYE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Champs spécifiques employés (nullable pour les admins)
   departementId Int?
-  dateEntree    DateTime?     @default(now())
+  dateEntree    DateTime? @default(now())
+  dateSortie    DateTime?
   dateNaissance DateTime?
   poste         String?
   salaire       Float?
@@ -28,10 +29,19 @@ model User {
   telephone     String?
 
   // Relations
-  departement   Departement?  @relation(fields: [departementId], references: [id])
-  conges        Conge[]
-  depenses      Depense[]
-  presences     Presence[]
+  departement Departement? @relation(fields: [departementId], references: [id])
+  conges      Conge[]
+  depenses    Depense[]
+  presences   Presence[]
+  files       UserFile[]
+}
+
+model UserFile {
+  id     Int    @id @default(autoincrement())
+  name   String
+  url    String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model Departement {
