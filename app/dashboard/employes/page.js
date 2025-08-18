@@ -194,21 +194,6 @@ export default function Page() {
 		const toastId = toast.loading('Suppression en cours...')
 
 		try {
-			if (employe.files && employe.files.length > 0) {
-				const filePaths = employe.files.map(file => {
-					// Supprime la partie publique de l'URL pour retrouver le chemin dans le bucket
-					const url = new URL(file.url);
-					return decodeURIComponent(url.pathname.replace(/^\/storage\/v1\/object\/public\//, ''));
-				});
-
-				const { error } = await supabase.storage
-					.from('user-files')
-					.remove(filePaths);
-
-				if (error) {
-					console.error('Erreur suppression fichiers storage :', error);
-				}
-			}
 			await axios.delete(`/api/employes/${id}`)
 			toast.success('Employé supprimé.', { id: toastId })
 			fetchEmployes() // Recharger la liste des employés
