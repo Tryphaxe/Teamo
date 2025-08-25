@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "../lib/supabase";
+import { create } from "../lib/supabase";
 import toast from 'react-hot-toast';
 
-const supabase = createClient();
+const supabase = create();
 
 export const useNotifications = () => {
   const [notifs, setNotifs] = useState([]);

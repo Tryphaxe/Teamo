@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { createClient } from '@/lib/supabase';
+import { create } from '@/lib/supabase';
 
 const navigation = [
 	{ name: 'Home', href: '/employee/home', icon: Home },
@@ -33,7 +33,7 @@ export default function Header() {
 	const isActive = (href) => pathname.startsWith(href);
 	const router = useRouter()
 
-	const supabase = createClient();
+	const supabase = create();
 	const fetchNotifications = async (userId) => {
 		const { data, error } = await supabase
 			.from("Notification")
