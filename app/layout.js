@@ -8,7 +8,7 @@ const afacad = Afacad({
 });
 
 export const metadata = {
-	title: "Teamo",
+	title: "JMK",
 	description: "Personal Management System",
 	icons: {
 		icon: "/timo.png",
