@@ -90,7 +90,7 @@ export default function Header() {
 										{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.nom : 'Non connecté'}
 									</p>
 								</div>
-								<div className="bg-teal-100 px-3 py-1 rounded-full flex items-center justify-center">
+								<div className="bg-blue-100 px-3 py-1 rounded-full flex items-center justify-center">
 									<p className="text-sm text-black capitalize">Admin</p>
 								</div>
 							</div>
@@ -126,8 +126,8 @@ export default function Header() {
 									<MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800">
 										<span className="absolute -inset-1.5" />
 										<span className="sr-only">OpenDra user menu</span>
-										<div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-											<span className="text-sm font-medium text-teal-700">
+										<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+											<span className="text-sm font-medium text-blue-700">
 												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? (user.nom + " " + user.prenom).split(' ').map(n => n[0]).join('') : 'X'}
 											</span>
 										</div>
@@ -196,7 +196,7 @@ export default function Header() {
 										<span
 											className={classNames(
 												isActive(item.href)
-													? 'border-teal-600 text-teal-800 font-semibold'
+													? 'border-blue-600 text-blue-800 font-semibold'
 													: 'border-none ',
 												'border  transition-all w-full duration-150'
 											)}>

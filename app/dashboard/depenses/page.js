@@ -143,8 +143,8 @@ export default function Page() {
 									<tr key={dep.id} className="hover:bg-gray-50">
 										<td className="px-6 py-4 whitespace-nowrap">
 											<div className="flex items-center gap-3">
-												<div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-													<span className="text-sm font-medium text-teal-700">
+												<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+													<span className="text-sm font-medium text-blue-700">
 														{
 															(dep.employe.nom + " " + dep.employe.prenom).split(' ').map(n => n[0]).join('')
 														}

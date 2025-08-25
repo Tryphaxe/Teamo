@@ -83,7 +83,7 @@ export default function Page() {
 									id="nom"
 									name="nom"
 									value={formClient.nom} onChange={handleClientChange}
-									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -92,7 +92,7 @@ export default function Page() {
 							<button
 								type="submit"
 								disabled={loading}
-								className="cursor-pointer px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								{loading ? 'Ajout en cours...' : 'Ajouter'}
 							</button>
@@ -123,7 +123,7 @@ export default function Page() {
 									id="nompro"
 									name="nom"
 									value={formProjet.nom} onChange={handleProjetChange}
-									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -134,7 +134,7 @@ export default function Page() {
 								<select
 									name="clientId"
 									value={formProjet.clientId} onChange={handleProjetChange}
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								>
 									<option value="">Sélectionner un client</option>
@@ -148,7 +148,7 @@ export default function Page() {
 							<button
 								type="submit"
 								disabled={loading}
-								className="cursor-pointer px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								{loading ? 'Ajout en cours...' : 'Ajouter'}
 							</button>
@@ -178,7 +178,7 @@ export default function Page() {
 				<div className="flex items-center gap-2">
 					<button
 						onClick={() => setShowClientForm(true)}
-						className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+						className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 					>
 						<UserPlus className="w-4 h-4" />
 						Client
@@ -209,7 +209,7 @@ export default function Page() {
 						<div className="">
 							{isloading ? (
 								<div className="flex items-center justify-center gap-1 p-3">
-									<Radius className='animate-spin w-4 h-4 text-teal-950' />
+									<Radius className='animate-spin w-4 h-4 text-blue-950' />
 									<span className="ml-2 text-gray-700">Chargement...</span>
 								</div>
 							) : clients.length === 0 ? (
@@ -281,7 +281,7 @@ export default function Page() {
 						<div className="">
 							{isloading ? (
 								<div className="flex items-center justify-center gap-3 p-3">
-									<Radius className='animate-spin w-4 h-4 text-teal-950' />
+									<Radius className='animate-spin w-4 h-4 text-blue-950' />
 									<span className="ml-2 text-gray-700">Chargement des projets...</span>
 								</div>
 							) : projets.length === 0 ? (
@@ -292,7 +292,7 @@ export default function Page() {
 									</div>
 									<button
 										onClick={() => setShowProjetForm(true)}
-										className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+										className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 									>
 										<Plus className="w-4 h-4" />
 										Ajouter

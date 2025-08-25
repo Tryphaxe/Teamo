@@ -244,7 +244,7 @@ export default function Page() {
 									name="nom"
 									value={form.nom} onChange={handleChange}
 									type="text"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -256,7 +256,7 @@ export default function Page() {
 									name="prenom"
 									value={form.prenom} onChange={handleChange}
 									type="text"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -268,7 +268,7 @@ export default function Page() {
 									name="dateNaissance"
 									value={form.dateNaissance} onChange={handleChange}
 									type="date"
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -279,7 +279,7 @@ export default function Page() {
 								<select
 									name="genre"
 									value={form.genre} onChange={handleChange}
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								>
 									<option value="">Sélectionner un genre</option>
@@ -295,7 +295,7 @@ export default function Page() {
 									name="telephone"
 									value={form.telephone} onChange={handleChange}
 									type="text"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -307,7 +307,7 @@ export default function Page() {
 									name="adresse"
 									value={form.adresse} onChange={handleChange}
 									type="text"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -324,7 +324,7 @@ export default function Page() {
 									name="poste"
 									value={form.poste} onChange={handleChange}
 									type="text"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -335,7 +335,7 @@ export default function Page() {
 								<select
 									name="departementId"
 									value={form.departementId} onChange={handleChange}
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								>
 									<option value="">Sélectionner un département</option>
@@ -352,7 +352,7 @@ export default function Page() {
 									name="salaire"
 									type="number"
 									value={form.salaire} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -364,7 +364,7 @@ export default function Page() {
 									name="dateEntree"
 									value={form.dateEntree} onChange={handleChange}
 									type="date"
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -376,7 +376,7 @@ export default function Page() {
 									name="dateSortie"
 									value={form.dateSortie} onChange={handleChange}
 									type="date"
-									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -393,7 +393,7 @@ export default function Page() {
 									name="email"
 									type="email"
 									value={form.email} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -405,7 +405,7 @@ export default function Page() {
 									name="password"
 									value={form.password} onChange={handleChange}
 									type="password"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 								/>
 							</div>
@@ -496,14 +496,14 @@ export default function Page() {
 							{editMode ? (
 								<button
 									type="submit"
-									className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+									className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 								>
 									{loading ? 'Modification en cours...' : 'Valider'}
 								</button>
 							) : (
 								<button
 									type="submit"
-									className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+									className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 								>
 									{loading ? 'Ajout en cours...' : 'Ajouter'}
 								</button>
@@ -539,7 +539,7 @@ export default function Page() {
 				{/* Champ de tri */}
 				<Listbox value={selectedDept} onChange={setSelectedDept}>
 					<div className="relative text-black">
-						<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-teal-600 sm:text-sm/6">
+						<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6">
 							{/* <span className="flex items-center gap-3 pr-6">
 								<span className="hidden">{selectedDept ? selectedDept.nom : 'Tous les départements'}</span>
 							</span> */}
@@ -554,13 +554,13 @@ export default function Page() {
 								<ListboxOption
 									key={dept.id ?? 'all'}
 									value={dept}
-									className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-teal-600 data-focus:text-white data-focus:outline-hidden"
+									className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-blue-600 data-focus:text-white data-focus:outline-hidden"
 								>
 									<div className="flex items-center min-w-max">
 										<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{dept.nom}</span>
 									</div>
 
-									<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-teal-600 group-not-data-selected:hidden group-data-focus:text-white">
+									<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-not-data-selected:hidden group-data-focus:text-white">
 										<CheckIcon aria-hidden="true" className="size-5" />
 									</span>
 								</ListboxOption>
@@ -583,7 +583,7 @@ export default function Page() {
 
 				<button
 					onClick={() => setShowForm(true)}
-					className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+					className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 				>
 					<Plus className="w-4 h-4" />
 					Ajouter
@@ -603,7 +603,7 @@ export default function Page() {
 				<div className="overflow-x-auto custom-scrollbar">
 					{isloading ? (
 						<div className="flex items-center justify-center gap-3 p-3">
-							<Radius className='animate-spin w-4 h-4 text-teal-950' />
+							<Radius className='animate-spin w-4 h-4 text-blue-950' />
 							<span className="ml-2 text-gray-700">Chargement des employés...</span>
 						</div>
 					) : employes.length === 0 ? (
@@ -614,7 +614,7 @@ export default function Page() {
 							</div>
 							<button
 								onClick={() => setShowForm(true)}
-								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								<Plus className="w-4 h-4" />
 								Ajouter
@@ -658,8 +658,8 @@ export default function Page() {
 									<tr key={emp.id} className="hover:bg-gray-50">
 										<td className="px-6 py-4 whitespace-nowrap">
 											<div className="flex items-center gap-3">
-												<div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
-													<User className="w-5 h-5 text-teal-600" />
+												<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+													<User className="w-5 h-5 text-blue-600" />
 												</div>
 												<div>
 													<p className="font-medium text-gray-900">{emp.nom}&nbsp;{emp.prenom}</p>

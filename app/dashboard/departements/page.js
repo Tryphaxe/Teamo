@@ -52,7 +52,7 @@ export default function Page() {
 									name="nom"
 									id="nom"
 									value={form.nom} onChange={handleChange}
-									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -61,7 +61,7 @@ export default function Page() {
 							<button
 								type="submit"
 								disabled={loading}
-								className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								{loading ? 'Ajout en cours...' : 'Ajouter'}
 							</button>
@@ -80,7 +80,7 @@ export default function Page() {
 				<h1 className="text-xl font-medium text-gray-900">Gestion des départements</h1>
 				<button
 					onClick={() => setShowForm(true)}
-					className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+					className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 				>
 					<Plus className="w-4 h-4" />
 					Ajouter
@@ -88,7 +88,7 @@ export default function Page() {
 			</div>
 			{isloading ? (
 				<div className="flex items-center justify-center gap-3 p-3">
-					<Radius className='animate-spin w-4 h-4 text-teal-950' />
+					<Radius className='animate-spin w-4 h-4 text-blue-950' />
 					<span className="ml-2 text-gray-700">Chargement des départements...</span>
 				</div>
 			) : departements.length === 0 ? (
@@ -99,7 +99,7 @@ export default function Page() {
 					</div>
 					<button
 						onClick={() => setShowForm(true)}
-						className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+						className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 					>
 						<Plus className="w-4 h-4" />
 						Ajouter
@@ -111,8 +111,8 @@ export default function Page() {
 						<div key={dep.nom} className="bg-white rounded-xl border border-gray-200 p-3">
 							<div className="flex items-center justify-between">
 								<div className='flex items-center gap-3'>
-									<div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
-										<span className="text-sm font-medium text-teal-700">
+									<div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+										<span className="text-sm font-medium text-blue-700">
 											{
 												(`${dep.nom}`).split(' ').map(n => n[0]).join('')
 											}

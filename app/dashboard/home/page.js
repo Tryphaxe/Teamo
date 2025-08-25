@@ -95,9 +95,9 @@ export default function Page() {
 
 	return (
 		<div>
-			<div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-6 text-white mb-3">
+			<div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white mb-3">
 				<h1 className="text-2xl font-bold mb-2">Tableau de bord administrateur</h1>
-				<p className="text-teal-100">Vue d&apos;ensemble de la gestion des employés</p>
+				<p className="text-blue-100">Vue d&apos;ensemble de la gestion des employés</p>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
@@ -146,7 +146,7 @@ export default function Page() {
 				<div className="bg-white rounded-md border border-gray-300 flex items-center gap-x-3 px-3 py-2 w-full">{/* Champ de tri */}
 					<Listbox value={selectedAp} onChange={setSelectedAp}>
 						<div className="relative text-black">
-							<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-teal-600 sm:text-sm/6">
+							<ListboxButton className="cursor-pointer p-2 rounded-md bg-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6">
 								{/* <span className="flex items-center gap-3 pr-6">
 								<span className="hidden">{selectedDept ? selectedDept.nom : 'Tous les départements'}</span>
 							</span> */}
@@ -161,13 +161,13 @@ export default function Page() {
 									<ListboxOption
 										key={ap.id ?? 'all'}
 										value={ap}
-										className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-teal-600 data-focus:text-white data-focus:outline-hidden"
+										className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-blue-600 data-focus:text-white data-focus:outline-hidden"
 									>
 										<div className="flex items-center min-w-max">
 											<span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{ap.nom}</span>
 										</div>
 
-										<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-teal-600 group-not-data-selected:hidden group-data-focus:text-white">
+										<span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 group-not-data-selected:hidden group-data-focus:text-white">
 											<CheckIcon aria-hidden="true" className="size-5" />
 										</span>
 									</ListboxOption>
@@ -188,7 +188,7 @@ export default function Page() {
 
 			{isloading ? (
 				<div className="flex items-center justify-center gap-3 p-3">
-					<Radius className='animate-spin w-4 h-4 text-teal-950' />
+					<Radius className='animate-spin w-4 h-4 text-blue-950' />
 					<span className="ml-2 text-gray-700">Chargement...</span>
 				</div>
 			) : presences.length === 0 ? (
@@ -203,8 +203,8 @@ export default function Page() {
 					{filteredPresences.map(pres => (
 						<li key={pres.id} className="flex justify-between gap-x-6 py-5">
 							<div className="flex min-w-0 gap-x-4">
-								<div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
-									<User className="w-5 h-5 text-teal-600" />
+								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+									<User className="w-5 h-5 text-blue-600" />
 								</div>
 								<div className="min-w-0 flex-auto">
 									<p className="text-sm font-semibold text-gray-900">{pres.nom + " " + pres.prenom}</p>

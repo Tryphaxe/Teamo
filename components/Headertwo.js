@@ -39,6 +39,7 @@ export default function Header() {
 			.from("Notification")
 			.select()
 			.eq("userId", userId)
+			.eq("targetRole", "USER")
 			.order("createdAt", { ascending: false })
 
 		if (data && !error) {
@@ -84,6 +85,7 @@ export default function Header() {
 
 	useEffect(() => {
 		const toast2 = toast.loading("Vérification de la session...");
+		let channel
 
 		fetch('/api/auth/currentUser')
 			.then(async (res) => {
@@ -110,36 +112,37 @@ export default function Header() {
 				setLoading(false);
 				if (data.user) {
 					fetchNotifications(data.user.id);
+					// Abonnement Realtime
+					channel = supabase
+						.channel("realnotifications")
+						.on(
+							"postgres_changes",
+							{
+								event: "INSERT",
+								schema: "public",
+								table: "Notification",
+								filter: `userId=eq.${data.user.id}`
+							},
+							payload => {
+								const newNotif = payload.new;
+								if (newNotif.targetRole !== 'USER') return;
+								setNotifs(prev => [payload.new, ...prev]);
+								setNonluCount(prev => prev + 1);
+								toast(newNotif.message, { icon: "✦" });
+							}
+						)
+						.subscribe();
 				}
-				// Abonnement Realtime
-				const channel = supabase
-					.channel("realnotifications")
-					.on(
-						"postgres_changes",
-						{
-							event: "INSERT",
-							schema: "public",
-							table: "Notification",
-							filter: `targetRole=eq.USER&userId=eq.${data.user.id}`
-						},
-						payload => {
-							const newNotif = payload.new;
-							setNotifs(prev => [payload.new, ...prev]);
-							setNonluCount(prev => prev + 1);
-							toast(newNotif.message, { icon: "✦" });
-						}
-					)
-					.subscribe();
-
-				return () => {
-					supabase.removeChannel(channel);
-				};
 
 			})
 			.catch(() => {
 				toast.error("Erreur de connexion au serveur.", { id: toast2 });
 				setLoading(false);
 			});
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
 	}, []);
 
 	const handleLogout = async () => {
@@ -158,15 +161,15 @@ export default function Header() {
 	};
 
 	const forDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+		const date = new Date(dateString);
+		const now = new Date();
+		const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-    if (diffInMinutes < 1) return "À l'instant";
-    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
-    if (diffInMinutes < 1440) return `Il y a ${Math.floor(diffInMinutes / 60)} h`;
-    return date.toLocaleDateString('fr-FR');
-  };
+		if (diffInMinutes < 1) return "À l'instant";
+		if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
+		if (diffInMinutes < 1440) return `Il y a ${Math.floor(diffInMinutes / 60)} h`;
+		return date.toLocaleDateString('fr-FR');
+	};
 
 	return (
 		<div className="bg-white sticky top-0 z-40 border-b border-gray-200">

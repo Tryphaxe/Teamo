@@ -69,7 +69,7 @@ function LoginForm() {
 							type="email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors"
+							className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 							placeholder="votre@email.com"
 							required
 						/>
@@ -90,7 +90,7 @@ function LoginForm() {
 							type={showPassword ? 'text' : 'password'}
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors"
+							className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 							placeholder="••••••••"
 							required
 						/>
@@ -120,7 +120,7 @@ function LoginForm() {
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg hover:from-teal-600 hover:to-teal-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+					className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{loading ? (
 						<>
@@ -139,7 +139,7 @@ function LoginForm() {
 // --- Page principale ---
 export default function LoginPageWrapper() {
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-orange-50 flex items-center justify-center p-4">
+		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center p-4">
 			<div className="w-full max-w-md">
 				{/* Logo et titre */}
 				<div className="text-center mb-8">

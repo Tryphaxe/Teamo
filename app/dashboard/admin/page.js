@@ -61,7 +61,7 @@ export default function Page() {
 									type="text"
 									name="nom"
 									value={form.nom} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -73,7 +73,7 @@ export default function Page() {
 									type="text"
 									name="prenom"
 									value={form.prenom} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -85,7 +85,7 @@ export default function Page() {
 									type="email"
 									name="email"
 									value={form.email} onChange={handleChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -98,7 +98,7 @@ export default function Page() {
 									name="password"
 									value={form.password} onChange={handleChange}
 									placeholder="********"
-									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
 							</div>
@@ -106,7 +106,7 @@ export default function Page() {
 						<div className="flex gap-2">
 							<button
 								type="submit"
-								className="px-4 py-2 cursor-pointer bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								className="px-4 py-2 cursor-pointer bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 							>
 								{loading ? 'Ajout en cours...' : 'Ajouter'}
 							</button>
@@ -136,7 +136,7 @@ export default function Page() {
 				</div>
 				<button
 					onClick={() => setShowForm(true)}
-					className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+					className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 				>
 					<Plus className="w-4 h-4" />
 					Ajouter
@@ -146,7 +146,7 @@ export default function Page() {
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
 				{isloading ? (
 					<div className="flex items-center gap-2 p-3">
-						<Radius className='animate-spin w-4 h-4 text-teal-950' />
+						<Radius className='animate-spin w-4 h-4 text-blue-950' />
 						<span className="ml-2 text-gray-700">Chargement...</span>
 					</div>
 				) : admins.length === 0 ? (
@@ -157,7 +157,7 @@ export default function Page() {
 						</div>
 						<button
 							onClick={() => setShowForm(true)}
-							className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+							className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
 						>
 							<Plus className="w-4 h-4" />
 							Ajouter
