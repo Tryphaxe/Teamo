@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Calendar, Check, Info, Loader2, Radius, Receipt, RefreshCw, User, UserRoundPen, X } from 'lucide-react';
+import { Calendar, Check, Eye, Info, Loader2, Radius, Receipt, RefreshCw, User, UserRoundPen, X } from 'lucide-react';
 import { formatDate, getFormattedDate } from '@/lib/date';
 import { checkPresence, submitPresence } from '@/lib/api/apiPresence';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
