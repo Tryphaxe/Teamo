@@ -27,9 +27,25 @@ export async function PUT(request, { params }) {
   }
 
   try {
+    const depense = await prisma.depense.findUnique({
+      where: { id }
+    })
+    const projet = await prisma.projet.findUnique({
+      where: { id: depense.projetId }
+    })
     const updatedDepense = await prisma.depense.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: { statut },
+    });
+
+    const statutText = statut === 'ACCEPTE' ? 'acceptée' : 'refusée';
+
+    const notificationsData = await prisma.notification.create({
+      data: {
+        message: `Votre dépense de ${depense.montant} pour le projet ${projet.nom} a été ${statutText}`,
+        userId: depense.employeId,
+        targetRole: 'USER',
+      },
     });
 
     return NextResponse.json(updatedDepense);

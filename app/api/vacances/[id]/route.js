@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 
 export async function DELETE(request, { params }) {
-  const id = parseInt(params.id);
+  const id = params.id;
 
   try {
     await prisma.vacance.delete({

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 // Supprimer un département
 export async function DELETE(request, { params }) {
-  const id = parseInt(params.id);
+  const id = params.id;
 
   try {
     await prisma.departement.delete({

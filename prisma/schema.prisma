@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   email     String   @unique
   password  String
   nom       String
@@ -18,7 +18,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Champs spécifiques employés (nullable pour les admins)
-  departementId Int?
+  departementId String?
   dateEntree    DateTime? @default(now())
   dateSortie    DateTime?
   dateNaissance DateTime?
@@ -27,6 +27,7 @@ model User {
   adresse       String?
   genre         String?
   telephone     String?
+  archived      Boolean   @default(false)
 
   // Relations
   departement Departement? @relation(fields: [departementId], references: [id])
@@ -34,43 +35,55 @@ model User {
   depenses    Depense[]
   presences   Presence[]
   files       UserFile[]
+  userNotifs  Notification[] @relation("userNotifs")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  userId    String?
+  isRead    Boolean  @default(false)
+  targetRole  RoleNotif      @default(ADMIN)
+  createdAt DateTime @default(now())
+
+  sender User? @relation("userNotifs", fields: [userId], references: [id])
 }
 
 model UserFile {
-  id     Int    @id @default(autoincrement())
+  id     String @id @default(cuid())
   name   String
   url    String
-  userId Int
+  userId String
   user   User   @relation(fields: [userId], references: [id])
 }
 
 model Departement {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   nom       String   @unique
   createdAt DateTime @default(now())
   employes  User[]
 }
 
 model Client {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   nom       String
   createdAt DateTime @default(now())
   projets   Projet[]
 }
 
 model Projet {
-  id        Int       @id @default(autoincrement())
+  id        String   @id @default(cuid())
   nom       String
-  clientId  Int
-  createdAt DateTime  @default(now())
+  clientId  String
+  createdAt DateTime @default(now())
   depenses  Depense[]
-  client    Client    @relation(fields: [clientId], references: [id])
+  client    Client   @relation(fields: [clientId], references: [id])
 }
 
 model Depense {
-  id          Int           @id @default(autoincrement())
-  employeId   Int
-  projetId    Int
+  id          String        @id @default(cuid())
+  employeId   String
+  projetId    String
   montant     Float
   description String?
   statut      StatutDepense @default(EN_ATTENTE)
@@ -81,8 +94,8 @@ model Depense {
 }
 
 model Conge {
-  id        Int         @id @default(autoincrement())
-  employeId Int
+  id        String      @id @default(cuid())
+  employeId String
   dateDebut DateTime
   dateFin   DateTime
   type      TypeConge
@@ -93,18 +106,23 @@ model Conge {
 }
 
 model Vacance {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   nom       String
   dateDebut DateTime
   dateFin   DateTime
 }
 
 model Presence {
-  id        Int      @id @default(autoincrement())
-  employeId Int
+  id        String   @id @default(cuid())
+  employeId String
   date      DateTime @default(now())
   present   Boolean
   employe   User     @relation(fields: [employeId], references: [id])
+}
+
+enum RoleNotif {
+  USER
+  ADMIN
 }
 
 enum Role {

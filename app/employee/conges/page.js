@@ -7,7 +7,8 @@ import { CheckIcon } from '@heroicons/react/20/solid';
 import { formatDate } from '@/lib/date';
 
 import { handleFormChange } from '@/lib/api/formUtils';
-import { fetchConges, submitForm } from '@/lib/api/apiConge';
+import { submitForm } from '@/lib/api/apiConge';
+import { fetchConges } from '@/lib/api/apiCongeUser'; 
 
 export default function Page() {
 	const [showForm, setShowForm] = useState(false);
@@ -29,7 +30,7 @@ export default function Page() {
 	];
 	const [selectedStatus, setSelectedStatus] = useState(filtresConges[0]);
 	const filteredConges = selectedStatus.id
-	? conges.filter(d => d.type === selectedStatus.id)
+	? conges.filter(d => d.statut === selectedStatus.id)
 	: conges;
 
 	// Récupération conges
@@ -51,7 +52,7 @@ export default function Page() {
 	});
 	const handleChange = (e) => handleFormChange(e, form, setForm);
 
-	// Fonction pour enregistrer une nouvelle dépense
+	// Fonction pour enregistrer un congé
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		await submitForm({
@@ -69,7 +70,7 @@ export default function Page() {
 			{showForm && (
 				<div className="bg-white rounded-xl border border-gray-200 p-6 mb-2">
 					<h3 className="text-lg font-semibold text-gray-900 mb-4">
-						Informations sur la dépense
+						Informations sur le congé
 					</h3>
 					<form onSubmit={handleSubmit} className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -95,7 +96,7 @@ export default function Page() {
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								>
-									<option value="">Sélectionner un projet</option>
+									<option value="" disabled>Sélectionner un projet</option>
 									{typesConge.map(type => (
 										<option key={type.id} value={type.id}>{type.nom}</option>
 									))}
@@ -224,7 +225,7 @@ export default function Page() {
 						<div className='flex flex-col items-center justify-center gap-2 p-2'>
 							<div className="flex items-center justify-center gap-2">
 								<Info className='w-4 h-4 text-red-800' />
-								<span className="ml-2 text-gray-700">Aucun département trouvé</span>
+								<span className="ml-2 text-gray-700">Aucune demande de congé trouvée !</span>
 							</div>
 							<button
 								onClick={() => setShowForm(true)}

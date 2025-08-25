@@ -7,7 +7,7 @@ import { CheckIcon } from '@heroicons/react/20/solid';
 import { formatDate } from '@/lib/date';
 
 import { submitForm } from '@/lib/api/apiDepense';
-import { fetchDepenses } from '@/lib/api/apiDepense';
+import { fetchDepenses } from '@/lib/api/apiDepenseUser';
 import { handleFormChange } from '@/lib/api/formUtils';
 import { fetchProjets } from '@/lib/api/apiProjet';
 

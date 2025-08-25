@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { createClient } from '@/lib/supabase';
 
 const navigation = [
 	{ name: 'Home', href: '/employee/home', icon: Home },
@@ -26,9 +27,60 @@ export default function Header() {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [openDra, setOpenDra] = useState(false);
+	const [notifs, setNotifs] = useState([]);
+	const [nonluCount, setNonluCount] = useState(0);
 
 	const isActive = (href) => pathname.startsWith(href);
 	const router = useRouter()
+
+	const supabase = createClient();
+	const fetchNotifications = async (userId) => {
+		const { data, error } = await supabase
+			.from("Notification")
+			.select()
+			.eq("userId", userId)
+			.order("createdAt", { ascending: false })
+
+		if (data && !error) {
+			setNotifs(data);
+			setNonluCount(data.filter(n => !n.isRead).length);
+		}
+	};
+
+	// Marquer une notification comme lue
+	const markAsRead = async (id) => {
+		const { data, error } = await supabase
+			.from("Notification")
+			.update({ isRead: true })
+			.eq("id", id);
+
+		if (error) {
+			console.error("Erreur Supabase:", error);
+			return;
+		}
+
+		setNotifs(prev =>
+			prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
+		);
+		setNonluCount(prev => prev - 1);
+	};
+
+	// Marquer toutes les notifications comme lues
+	const markAllAsRead = async () => {
+		const { data, error } = await supabase
+			.from("Notification")
+			.update({ isRead: true })
+			.eq("isRead", false)
+			.eq("targetRole", "USER");
+
+		if (error) {
+			console.error("Erreur Supabase:", error);
+			return;
+		}
+
+		setNotifs(prev => prev.map(n => ({ ...n, isRead: true })));
+		setNonluCount(0);
+	};
 
 	useEffect(() => {
 		const toast2 = toast.loading("Vérification de la session...");
@@ -56,6 +108,33 @@ export default function Header() {
 
 				setUser(data.user);
 				setLoading(false);
+				if (data.user) {
+					fetchNotifications(data.user.id);
+				}
+				// Abonnement Realtime
+				const channel = supabase
+					.channel("realnotifications")
+					.on(
+						"postgres_changes",
+						{
+							event: "INSERT",
+							schema: "public",
+							table: "Notification",
+							filter: `targetRole=eq.USER&userId=eq.${data.user.id}`
+						},
+						payload => {
+							const newNotif = payload.new;
+							setNotifs(prev => [payload.new, ...prev]);
+							setNonluCount(prev => prev + 1);
+							toast(newNotif.message, { icon: "✦" });
+						}
+					)
+					.subscribe();
+
+				return () => {
+					supabase.removeChannel(channel);
+				};
+
 			})
 			.catch(() => {
 				toast.error("Erreur de connexion au serveur.", { id: toast2 });
@@ -77,6 +156,17 @@ export default function Header() {
 			toast.error('Une erreur est survenue', { id: toast3 });
 		}
 	};
+
+	const forDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+
+    if (diffInMinutes < 1) return "À l'instant";
+    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
+    if (diffInMinutes < 1440) return `Il y a ${Math.floor(diffInMinutes / 60)} h`;
+    return date.toLocaleDateString('fr-FR');
+  };
 
 	return (
 		<div className="bg-white sticky top-0 z-40 border-b border-gray-200">
@@ -106,9 +196,13 @@ export default function Header() {
 
 						<div className="flex items-center gap-2">
 							<button onClick={() => setOpenDra(true)}
-								className="px-2 py-2 cursor-pointer border border-gray-200 rounded-full transition-all bg-white
-															 text-black hover:bg-gray-100">
+								className="px-2 py-2 cursor-pointer relative border border-gray-200 rounded-full transition-all bg-white text-black hover:bg-gray-100">
 								<Bell className="w-5 h-5" />
+								{nonluCount > 0 && (
+									<span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+										{nonluCount}
+									</span>
+								)}
 							</button>
 
 							<div className="flex items-center pl-2 border-l border-gray-200">
@@ -134,12 +228,9 @@ export default function Header() {
 											</span>
 										</MenuItem>
 										<MenuItem>
-											<a
-												href="#"
-												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-											>
-												Mon Profil
-											</a>
+											<span className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden">
+												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? (user.email) : 'Non connecté'}
+											</span>
 										</MenuItem>
 										<MenuItem>
 											<button
@@ -219,48 +310,49 @@ export default function Header() {
 										<div className="px-4 sm:px-6">
 											<DialogTitle className="text-base font-semibold text-gray-900">
 												<div className="flex items-center gap-3">
-													<Bell className="w-5 h-5" />
-													<h1 className="">Notifications</h1>
+													<span className="text-2xl">Notifications</span>
 												</div>
 											</DialogTitle>
 										</div>
 										<div className="relative mt-6 flex-1 px-4 sm:px-6">
-											<div className=" grid grid-cols-1 space-y-2">
-												<div key="1" className="bg-gray-50 rounded-md px-2.5 py-2">
-													<div className="flex items-center gap-4">
-														<div className="w-10 h-10 text-sm p-1 font-medium 
-																	text-black bg-white border border-gray-200 
-																		rounded-lg flex items-center justify-center">
-															{
-																("Congés").split(' ').map(n => n[0]).join('')
-															}
-														</div>
-														<div>
-															<p className="text-sm italic font-medium text-gray-600">Il y a 2 jours</p>
-															<p className="text-sm text-gray-900 mt-1">
-																L&apos;administrateur a validée votre demande de congé maladie...</p>
-														</div>
-													</div>
+											{nonluCount > 0 ? (
+												<div className="flex mb-2">
+													<button
+														onClick={markAllAsRead}
+														className="text-md p-2 rounded-md cursor-pointer text-blue-600 w-full bg-blue-50 border border-blue-300 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-500"
+													>
+														Tout marquer comme lu
+													</button>
 												</div>
-												<div key="2" className="bg-gray-50 rounded-md px-2.5 py-2">
-													<div className="flex items-center gap-4">
-														<div className="w-10 h-10 text-sm p-1 font-medium 
-																	text-black bg-white border border-gray-200 
-																		rounded-lg flex items-center justify-center">
-															{
-																("Dépenses").split(' ').map(n => n[0]).join('')
-															}
+											) : ""}
+
+											<div className="grid grid-cols-1 space-y-2">
+												{notifs.length === 0 ? (
+													<p className="text-sm text-gray-500">Aucune notification</p>
+												) : (
+													notifs.map((notif) => (
+														<div
+															key={notif.id}
+															onClick={() => markAsRead(notif.id)}
+															className={`p-3 flex items-start space-x-3 rounded-md border cursor-pointer
+															${notif.isRead ? 'bg-gray-100 border-gray-200' : 'bg-blue-50 border-blue-300'} 
+															hover:bg-gray-200 transition-colors duration-500`}
+														>
+															<div className="mr-3 flex items-center justify-center h-full">
+																<Bell size={16} />
+															</div>
+															<div>
+																<p className="text-md text-gray-900">{notif.message}</p>
+																<p className="text-sm text-gray-500 italic mt-1">
+																	{forDate(notif.createdAt)}
+																</p>
+															</div>
 														</div>
-														<div>
-															<p className="text-sm italic font-medium text-gray-600">Il y a 2 jours</p>
-															<p className="text-sm text-gray-900 mt-1">
-																L&apos;administrateur a validée votre dépense pour le projet IDH...
-															</p>
-														</div>
-													</div>
-												</div>
+													))
+												)}
 											</div>
 										</div>
+
 									</div>
 								</DialogPanel>
 							</div>

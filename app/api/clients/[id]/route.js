@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 // Supprimer un projet
 export async function DELETE(request, { params }) {
-  const clientId = parseInt(params.id);
+  const clientId = params.id;
 
   try {
     // Supprimer tous les projets liés

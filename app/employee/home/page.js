@@ -5,8 +5,8 @@ import toast from 'react-hot-toast';
 import { Calendar, Check, Info, Loader2, Radius, Receipt, RefreshCw, User, UserRoundPen, X } from 'lucide-react';
 import { formatDate, getFormattedDate } from '@/lib/date';
 import { checkPresence, submitPresence } from '@/lib/api/apiPresence';
-import { fetchVacances } from '@/lib/api/apiVacance';
-
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 export default function Page() {
 	const [user, setUser] = useState(null);
@@ -15,16 +15,12 @@ export default function Page() {
 	const today = new Date();
 	const todayStr = getFormattedDate(today);
 	const [stat, setStat] = useState(undefined);
-	const [vacances, setVacances] = useState([])
+	const [openDra, setOpenDra] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		const result = await checkPresence(todayStr);
 		setStat(result);
 	}, [todayStr]);
-
-	const fvac = useCallback(async () => {
-		fetchVacances(setVacances, setLoading);
-	}, [setVacances, setLoading])
 
 	useEffect(() => {
 		fetch('/api/auth/currentUser')
@@ -33,9 +29,8 @@ export default function Page() {
 				setUser(data.user);
 				setLoading(false);
 			});
-		fvac();
 		fetchData();
-	}, [fvac, fetchData]);
+	}, [fetchData]);
 
 	const handleSubmit = async (present) => {
 		setIsLoading(true);
@@ -49,6 +44,49 @@ export default function Page() {
 			console.error('Erreur lors de la soumission de la présence :', error);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const [form, setForm] = useState({
+		email: '',
+		password: '',
+		nom: '',
+		prenom: '',
+		telephone: '',
+		adresse: '',
+	});
+	const handleChange = (e) => {
+		setForm({ ...form, [e.target.name]: e.target.value });
+	};
+	// Fonction pour enregistrer un nouvel employé
+	const handleSubmitUpdate = async (e) => {
+		e.preventDefault();
+		setLoading(true);
+		const toastttt = toast.loading("Modification en cours...");
+
+		try {
+			const res = await fetch(`/api/employes/${user.id}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					...form,
+					password: form.password !== '' ? form.password : undefined,
+				}),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				toast.error(data.error || "Erreur lors de l'enregistrement", { id: toastttt });
+				return;
+			}
+			toast.success("Modification réussie !", { id: toastttt });
+			setOpenDra(false);
+		} catch (err) {
+			console.error(err);
+			toast.error('Erreur lors de la modification.', { id: toastttt });
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -71,6 +109,18 @@ export default function Page() {
 						<p className="text-gray-600">{loading ? (<span className="px-10 bg-gray-200 rounded animate-pulse w-full"></span>) : user ? user.poste : ' '}</p>
 						<p className="text-sm text-gray-500">{loading ? (<span className="px-10 bg-gray-200 rounded animate-pulse w-full"></span>) : user ? user.departement.nom : ' '}</p>
 						<button
+							onClick={() => {
+								setOpenDra(true);
+								setForm({
+									nom: user.nom || '',
+									prenom: user.prenom || '',
+									email: user.email || '',
+									password: '', // vide par défaut
+									telephone: user.telephone || '',
+									adresse: user.adresse || '',
+								});
+
+							}}
 							className="flex items-center mt-2 gap-2 px-4 py-2 bg-orange-500 text-white rounded-2xl hover:bg-orange-600 transition-colors"
 						>
 							<UserRoundPen className="w-4 h-4" />
@@ -94,6 +144,34 @@ export default function Page() {
 					<div>
 						<p className="text-sm text-gray-500">Adresse</p>
 						<p className="font-medium">{loading ? (<span className="px-10 bg-gray-200 rounded animate-pulse w-full"></span>) : user ? user.adresse : ' '}</p>
+					</div>
+				</div>
+				<div className="mt-3">
+					<div className='w-full bg-gray-50 p-2 rounded-md'>Mes documents</div>
+					<div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+						{/* Bloc : Fichiers joints */}
+						<div>
+							{user?.files?.length > 0 ? (
+								<ul className="space-y-2">
+									{user?.files.map((file, index) => (
+										<li key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
+											<span className="truncate">{file.name}</span>
+											<a
+												href={file.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-gray-800"
+												download
+											>
+												<Eye size={20} />
+											</a>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-gray-500 text-sm">Aucun document disponible !</p>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -161,58 +239,153 @@ export default function Page() {
 				</div>
 			</div>
 
-			<div className="bg-gradient-to-r from-white to-blue-100 rounded-xl border border-gray-200">
-				<div className="p-3 border-b border-gray-200">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-gray-900">Mes vacances</h3>
-						<button
-							title="Actualiser"
-							onClick={fvac}
-							className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
-						>
-							<RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-						</button>
-					</div>
-				</div>
 
-				<div className="p-3">
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-						{loading ? (
-							<div className="flex items-center gap-2 p-3">
-								<Radius className='animate-spin w-4 h-4 text-teal-950' />
-								<span className="ml-2 text-gray-700">Chargement...</span>
-							</div>
-						) : vacances.length === 0 ? (
-							<div className='flex items-center p-3'>
-								<div className="flex items-center justify-center gap-2">
-									<Info className='w-4 h-4 text-red-800' />
-									<span className="ml-2 text-gray-700">Aucune donnée trouvée !</span>
-								</div>
-							</div>
-						) : (
-							vacances.map(vac => (
-								<div key={vac.id} className="bg-white rounded-xl border border-gray-200 p-3">
-									<div className="flex items-center justify-between">
-										<div className='flex items-center gap-3'>
-											<div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-												<span className="text-sm font-medium text-blue-700">
-													{
-														(vac.nom).split(' ').map(n => n[0]).join('')
-													}
-												</span>
-											</div>
-											<div>
-												<p className="text-2xl font-bold text-gray-900 mt-1">{vac.nom}</p>
-												<p className="text-sm font-medium text-gray-600">A partir du {formatDate(vac.dateDebut)}</p>
-												<p className="text-sm font-medium text-gray-600">Fin : {formatDate(vac.dateFin)}</p>
-											</div>
+			<div className='z-50'>
+				<Dialog open={openDra} onClose={setOpenDra} className="relative z-50">
+					<DialogBackdrop
+						transition
+						className="fixed inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
+					/>
+
+					<div className="fixed inset-0 overflow-hidden">
+						<div className="absolute inset-0 overflow-hidden">
+							<div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+								<DialogPanel
+									transition
+									className="pointer-events-auto relative w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+								>
+									<TransitionChild>
+										<div className="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 duration-500 ease-in-out data-closed:opacity-0 sm:-ml-10 sm:pr-4">
+											<button
+												type="button"
+												onClick={() => setOpenDra(false)}
+												className="relative rounded-md text-gray-300 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden cursor-pointer"
+											>
+												<span className="absolute -inset-2.5" />
+												<span className="sr-only">Close panel</span>
+												<XMarkIcon aria-hidden="true" className="size-6" />
+											</button>
+										</div>
+									</TransitionChild>
+									<div className="flex h-full flex-col overflow-y-auto bg-white py-6 shadow-xl">
+										<div className="px-4 sm:px-6">
+											<DialogTitle className="text-xl font-semibold text-gray-900">
+												<div className="flex items-center">
+													<span className="Text-xl">Modifier mon profil</span>
+												</div>
+											</DialogTitle>
+										</div>
+										<div className="relative mt-6 flex-1 px-4 sm:px-6">
+											<form onSubmit={handleSubmitUpdate}>
+												<div className=" grid grid-cols-1 space-y-2">
+													<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 text-orange-600 text-xl">
+														<span className='uppercase'>Informations personnelles</span>
+													</div>
+													<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Nom
+															</label>
+															<input
+																name="nom"
+																value={form.nom} onChange={handleChange}
+																type="text"
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Prénom(s)
+															</label>
+															<input
+																name="prenom"
+																value={form.prenom} onChange={handleChange}
+																type="text"
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Téléphone
+															</label>
+															<input
+																name="telephone"
+																value={form.telephone} onChange={handleChange}
+																type="text"
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Adresse
+															</label>
+															<input
+																name="adresse"
+																value={form.adresse} onChange={handleChange}
+																type="text"
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+													</div>
+													<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 mb-4 text-orange-600 text-xl">
+														<span className='uppercase'>Informations de connexion</span>
+													</div>
+													<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Email
+															</label>
+															<input
+																name="email"
+																type="email"
+																value={form.email} onChange={handleChange}
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+														<div>
+															<label className="block text-sm font-medium text-black mb-1">
+																Mot de passe
+															</label>
+															<input
+																name="password"
+																value={form.password} onChange={handleChange}
+																type="password"
+																className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+
+															/>
+														</div>
+													</div>
+													<div className="flex gap-2 mt-3">
+														<button
+															type="submit"
+															className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+														>
+															{loading ? (
+																<Loader2 className="animate-spin h-5 w-5" />
+															) : 'Valider'}
+														</button>
+														<button
+															type="button"
+															className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition-colors"
+															onClick={() => setOpenDra(false)}
+														>
+															Annuler la modification
+														</button>
+													</div>
+												</div>
+											</form>
 										</div>
 									</div>
-								</div>
-							))
-						)}
+								</DialogPanel>
+							</div>
+						</div>
 					</div>
-				</div>
+				</Dialog>
 			</div>
 		</div>
 	)

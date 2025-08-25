@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
+import { createClient } from '@/lib/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -26,7 +27,7 @@ export async function GET() {
 // POST : créer une dépense
 export async function POST(req) {
   const body = await req.json();
-  const { montant, description, projetId } = body;
+  const { montant, description, projetId, date } = body;
 
   // 1. Lire le token dans les cookies
   const cookieStore = await cookies();
@@ -57,7 +58,24 @@ export async function POST(req) {
       montant: parseFloat(montant),
       description,
       employeId,
-      projetId: projetId ? parseInt(projetId) : null,
+      projetId,
+    },
+  });
+
+  // 4. Récupérer l'employé
+  const employe = await prisma.user.findUnique({ where: { id: employeId } });
+  if (!employe) throw new Error("Employé introuvable");
+
+  // 4. Récupérer l'employé
+  const projet = await prisma.projet.findUnique({ where: { id: projetId } });
+  if (!projet) throw new Error("Projet introuvable");
+
+  // Création de la notification
+  const notificationsData = await prisma.notification.create({
+    data: {
+      message: `${employe.nom + ' ' + employe.prenom} a fait une demande de dépense de ${montant}FCFA pour le projet ${projet.nom}.`,
+      userId: employeId,
+      targetRole: 'ADMIN',
     },
   });
 

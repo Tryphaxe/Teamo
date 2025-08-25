@@ -11,7 +11,7 @@ export async function POST(req) {
     const { email, password } = await req.json();
 
     // Recherche dans la table unique User
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email, archived: false } });
 
     // Vérification si l'utilisateur existe et que le mot de passe est correct
     if (!user || !(await bcrypt.compare(password, user.password))) {

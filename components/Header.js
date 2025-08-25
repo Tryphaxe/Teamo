@@ -10,6 +10,8 @@ import toast from 'react-hot-toast';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
+import { useNotifications } from './useNotifications';
+
 const navigation = [
 	{ name: 'Home', href: '/dashboard/home', icon: Home },
 	{ name: 'Employés', href: '/dashboard/employes', icon: Users },
@@ -17,7 +19,6 @@ const navigation = [
 	{ name: 'Dépenses', href: '/dashboard/depenses', icon: HandCoins },
 	{ name: 'Client & Projets', href: '/dashboard/clientsprojets', icon: UserCog },
 	{ name: 'Demande de congés', href: '/dashboard/conges', icon: MailQuestion },
-	{ name: 'Vacances', href: '/dashboard/vacances', icon: TreePalm },
 	{ name: 'Admin', href: '/dashboard/admin', icon: ShieldUser },
 ];
 
@@ -30,6 +31,7 @@ export default function Header() {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [openDra, setOpenDra] = useState(false);
+	const { notifs, nonluCount, markAllAsRead, markAsRead } = useNotifications();
 
 	const isActive = (href) => pathname.startsWith(href);
 	const router = useRouter()
@@ -41,13 +43,16 @@ export default function Header() {
 		{ href: '/dashboard/parametres', icon: Settings, onClick: () => setShowSettings() },
 	];
 
+	// Initialisation user + notifications
 	useEffect(() => {
-		fetch('/api/auth/currentUser')
-			.then(res => res.json())
-			.then(data => {
-				setUser(data.user);
-				setLoading(false);
-			});
+		const init = async () => {
+			const res = await fetch('/api/auth/currentUser');
+			const data = await res.json();
+			setUser(data.user);
+			setLoading(false);
+		};
+
+		init();
 	}, []);
 
 
@@ -93,9 +98,13 @@ export default function Header() {
 
 						<div className="flex items-center gap-2">
 							<button onClick={() => setOpenDra(true)}
-								className="px-2 py-2 cursor-pointer border border-gray-200 rounded-full transition-all bg-white
-									 text-black hover:bg-gray-100">
+								className="px-2 py-2 cursor-pointer relative border border-gray-200 rounded-full transition-all bg-white text-black hover:bg-gray-100">
 								<Bell className="w-5 h-5" />
+								{nonluCount > 0 && (
+									<span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+										{nonluCount}
+									</span>
+								)}
 							</button>
 
 							{boutons.map((item) => {
@@ -230,32 +239,49 @@ export default function Header() {
 										<div className="px-4 sm:px-6">
 											<DialogTitle className="text-base font-semibold text-gray-900">
 												<div className="flex items-center gap-3">
-													<Bell className="w-5 h-5" />
-													<h1 className="">Notifications</h1>
+													<span className="text-2xl">Notifications</span>
 												</div>
 											</DialogTitle>
 										</div>
 										<div className="relative mt-6 flex-1 px-4 sm:px-6">
-											<div className=" grid grid-cols-1 space-y-2">
-												<div key="1" className="bg-gray-50 rounded-md px-2.5 py-2">
-													<div className="flex items-center gap-4">
-														<div className="w-10 h-10 text-sm p-1 font-medium 
-														text-black bg-white border border-gray-200 
-															rounded-lg flex items-center justify-center">
-															{
-																("Informatique").split(' ').map(n => n[0]).join('')
-															}
-														</div>
-														<div>
-															<p className="text-sm italic font-medium text-gray-600">Il y a 2 jours</p>
-															<p className="text-sm text-gray-900 mt-1">
-																L&apos;employé KONE Moussa demande 3 jours 
-																de congés pour cause maladie !</p>
-														</div>
-													</div>
+											{nonluCount > 0 ? (
+												<div className="flex mb-2">
+													<button
+														onClick={markAllAsRead}
+														className="text-md p-2 rounded-md cursor-pointer text-blue-600 w-full bg-blue-50 border border-blue-300 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-500"
+													>
+														Tout marquer comme lu
+													</button>
 												</div>
+											) : ""}
+
+											<div className="grid grid-cols-1 space-y-2">
+												{notifs.length === 0 ? (
+													<p className="text-sm text-gray-500">Aucune notification</p>
+												) : (
+													notifs.map((notif) => (
+														<div
+															key={notif.id}
+															onClick={() => markAsRead(notif.id)}
+															className={`p-3 flex items-start space-x-3 rounded-md border cursor-pointer
+															${notif.isRead ? 'bg-gray-100 border-gray-200' : 'bg-blue-50 border-blue-300'} 
+															hover:bg-gray-200 transition-colors duration-500`}
+														>
+															<div className="mr-3 flex items-center justify-center h-full">
+																<Bell size={16} />
+															</div>
+															<div>
+																<p className="text-md text-gray-900">{notif.message}</p>
+																<p className="text-sm text-gray-500 italic mt-1">
+																	{new Date(notif.createdAt).toLocaleString()}
+																</p>
+															</div>
+														</div>
+													))
+												)}
 											</div>
 										</div>
+
 									</div>
 								</DialogPanel>
 							</div>

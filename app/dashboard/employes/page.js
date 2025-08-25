@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, User, Upload, Radius, Info, Search, ListFilter, Eye, CloudUpload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios'
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Switch } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { supabase } from '@/lib/supabase';
@@ -87,6 +87,7 @@ export default function Page() {
 		genre: '',
 		dateNaissance: '',
 		dateEntree: '',
+		dateSortie: '',
 		poste: '',
 		salaire: '',
 		departementId: '',
@@ -187,20 +188,32 @@ export default function Page() {
 	};
 
 	// Fonction pour supprimer un employé
-	const handleDelete = async (id) => {
-		const confirm = window.confirm('Supprimer cet employé ?')
-		if (!confirm) return
+	// const handleDelete = async (id) => {
+	// 	const confirm = window.confirm('Supprimer cet employé ?')
+	// 	if (!confirm) return
 
-		const toastId = toast.loading('Suppression en cours...')
+	// 	const toastId = toast.loading('Suppression en cours...')
 
+	// 	try {
+	// 		await axios.delete(`/api/employes/${id}`)
+	// 		toast.success('Employé supprimé.', { id: toastId })
+	// 		fetchEmployes() // Recharger la liste des employés
+	// 	} catch (error) {
+	// 		toast.error('Erreur lors de la suppression.', { id: toastId })
+	// 	}
+	// }
+	const toggleArchive = async (id, currentStatus) => {
+		const toastId = toast.loading(currentStatus ? "Restauration..." : "Archivage...");
 		try {
-			await axios.delete(`/api/employes/${id}`)
-			toast.success('Employé supprimé.', { id: toastId })
-			fetchEmployes() // Recharger la liste des employés
+			await axios.put(`/api/employes/${id}/archive`, {
+				archived: !currentStatus,
+			});
+			toast.success(currentStatus ? "Employé restauré." : "Employé archivé.", { id: toastId });
+			fetchEmployes(); // rechargement de la liste
 		} catch (error) {
-			toast.error('Erreur lors de la suppression.', { id: toastId })
+			toast.error("Erreur lors du changement de statut.", { id: toastId });
 		}
-	}
+	};
 
 	// 🔍 Filtrage dynamique
 	const filteredEmployes = employes.filter((employe) => {
@@ -225,49 +238,49 @@ export default function Page() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Nom
+									Nom <label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="nom"
 									value={form.nom} onChange={handleChange}
 									type="text"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Prénom(s)
+									Prénom(s)<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="prenom"
 									value={form.prenom} onChange={handleChange}
 									type="text"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Date de naissance
+									Date de naissance<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="dateNaissance"
 									value={form.dateNaissance} onChange={handleChange}
 									type="date"
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Genre
+									Genre<label className="text-red-500 text-md">*</label>
 								</label>
 								<select
 									name="genre"
 									value={form.genre} onChange={handleChange}
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								>
 									<option value="">Sélectionner un genre</option>
 									<option value="M">Masculin</option>
@@ -276,14 +289,14 @@ export default function Page() {
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Téléphone
+									Téléphone<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="telephone"
 									value={form.telephone} onChange={handleChange}
 									type="text"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
@@ -295,7 +308,7 @@ export default function Page() {
 									value={form.adresse} onChange={handleChange}
 									type="text"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 						</div>
@@ -305,25 +318,25 @@ export default function Page() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Poste
+									Poste<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="poste"
 									value={form.poste} onChange={handleChange}
 									type="text"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Département
+									Département<label className="text-red-500 text-md">*</label>
 								</label>
 								<select
 									name="departementId"
 									value={form.departementId} onChange={handleChange}
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								>
 									<option value="">Sélectionner un département</option>
 									{departements.map(dep => (
@@ -340,19 +353,19 @@ export default function Page() {
 									type="number"
 									value={form.salaire} onChange={handleChange}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Date d&apos;entrée
+									Date d&apos;entrée<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="dateEntree"
 									value={form.dateEntree} onChange={handleChange}
 									type="date"
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
@@ -364,7 +377,7 @@ export default function Page() {
 									value={form.dateSortie} onChange={handleChange}
 									type="date"
 									className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 						</div>
@@ -374,39 +387,65 @@ export default function Page() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Email
+									Email<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="email"
 									type="email"
 									value={form.email} onChange={handleChange}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 							<div>
 								<label className="block text-sm font-medium text-black mb-1">
-									Mot de passe
+									Mot de passe<label className="text-red-500 text-md">*</label>
 								</label>
 								<input
 									name="password"
 									value={form.password} onChange={handleChange}
 									type="password"
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-									required
+
 								/>
 							</div>
 						</div>
 						<div className="bg-orange-100 p-1 my-4 border-b border-gray-200 mb-4 text-orange-600 text-xl">
 							<span className='uppercase'>Documents associés</span>
 						</div>
-						<div className="flex-1 items-center max-w-screen-sm mx-auto mb-3 space-y-4 sm:flex sm:space-y-0">
-							<div className="relative w-full">
-								<div className="items-center justify-center max-w-xl mx-auto">
-									<label className="flex justify-center w-full h-32 px-4 transition 
-											bg-white border-2 border-gray-300 border-dashed rounded-md 
-											appearance-none cursor-pointer hover:border-gray-400 
-											focus:outline-none" id="drop">
+						<div>
+							{/* Affichage des fichiers PDF existants (en mode édition) */}
+							{editMode && pdfs.length > 0 && (
+								<div className="max-w-xl mx-auto mt-4 space-y-2">
+									{pdfs.map((pdf, index) => (
+										<div key={index} className="flex items-center justify-between px-4 py-2 bg-orange-50 rounded">
+											<span className="text-gray-700 truncate">{pdf.name || `Fichier ${index + 1}`}</span>
+											<div className="flex items-center gap-2">
+												<a
+													href={pdf.url || URL.createObjectURL(pdf)}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-blue-600 underline text-sm"
+												>
+													<Eye size={20} />
+												</a>
+												<button
+													type="button"
+													onClick={() => removePdf(index)}
+													className="text-red-500 hover:text-red-700"
+												>
+													<Trash2 size={20} />
+												</button>
+											</div>
+										</div>
+									))}
+								</div>
+							)}
+
+							{/* Upload de nouveaux fichiers (même si en édition) */}
+							<div className="flex-1 items-center max-w-screen-sm mx-auto mb-3 space-y-4 sm:flex sm:space-y-0 mt-4">
+								<div className="relative w-full">
+									<label className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
 										<span className="flex items-center space-x-2">
 											<CloudUpload size={20} color="#8d8d8dff" />
 											<span className="font-medium text-gray-600">
@@ -420,13 +459,13 @@ export default function Page() {
 											className="hidden"
 											accept="application/pdf"
 											multiple
-											id="input"
 											onChange={handleFileChange}
 										/>
 									</label>
 								</div>
 							</div>
 						</div>
+
 
 						{/* Affichage des fichiers PDF */}
 						<div className="max-w-xl mx-auto mt-4 space-y-2">
@@ -454,12 +493,21 @@ export default function Page() {
 							))}
 						</div>
 						<div className="flex gap-2">
-							<button
-								type="submit"
-								className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
-							>
-								{loading ? 'Ajout en cours...' : 'Ajouter'}
-							</button>
+							{editMode ? (
+								<button
+									type="submit"
+									className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								>
+									{loading ? 'Modification en cours...' : 'Valider'}
+								</button>
+							) : (
+								<button
+									type="submit"
+									className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+								>
+									{loading ? 'Ajout en cours...' : 'Ajouter'}
+								</button>
+							)}
 							{editMode ? (
 								<button
 									type="button"
@@ -468,6 +516,7 @@ export default function Page() {
 										setEditMode(false);
 										setSelectedEmploye(null);
 										setForm(emptyForm);
+										setPdfs(emp.files || []);
 									}}
 								>
 									Annuler la modification
@@ -597,6 +646,9 @@ export default function Page() {
 										Date d&apos;embauche
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Archiver
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Actions
 									</th>
 								</tr>
@@ -633,6 +685,18 @@ export default function Page() {
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{formatDate(emp.dateEntree)}
 										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+											<Switch
+												checked={emp.archived}
+												onChange={() => toggleArchive(emp.id, emp.archived)}
+												className="group relative flex h-7 w-14 cursor-pointer rounded-full bg-green-500 p-1 ease-in-out focus:not-data-focus:outline-none data-checked:bg-red-600 data-focus:outline data-focus:outline-white"
+											>
+												<span
+													aria-hidden="true"
+													className="pointer-events-none inline-block size-5 translate-x-0 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out group-data-checked:translate-x-7"
+												/>
+											</Switch>
+										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
 											<div className="flex gap-2">
 												<button
@@ -655,12 +719,12 @@ export default function Page() {
 												>
 													<Edit className="w-4 h-4" />
 												</button>
-												<button
+												{/* <button
 													onClick={() => handleDelete(emp.id)}
 													className="flex items-center gap-2 cursor-pointer px-2 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
 												>
 													<Trash2 className="w-4 h-4" />
-												</button>
+												</button> */}
 											</div>
 										</td>
 									</tr>
@@ -746,15 +810,15 @@ export default function Page() {
 													{selectedDetails.files?.length > 0 ? (
 														<ul className="space-y-2">
 															{selectedDetails.files.map((file, index) => (
-																<li key={index} className="flex justify-between items-center bg-orange-50 p-2 rounded border">
+																<li key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
 																	<span className="truncate">{file.name}</span>
 																	<a
 																		href={file.url}
 																		target="_blank"
 																		rel="noopener noreferrer"
-																		className="text-blue-600 hover:underline text-sm"
+																		className="text-gray-800"
 																	>
-																		Voir
+																		<Eye size={20} />
 																	</a>
 																</li>
 															))}

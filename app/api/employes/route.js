@@ -48,7 +48,7 @@ export async function POST(request) {
 
     if (
       !email || !password || !nom || !prenom || !dateNaissance ||
-      !dateEntree || !dateSortie || !poste || !salaire || !departementId
+      !genre || !telephone || !dateEntree || !poste || !departementId
     ) {
       return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
     }
@@ -77,7 +77,7 @@ export async function POST(request) {
         dateSortie: new Date(dateSortie),
         poste,
         salaire: parseFloat(salaire),
-        departementId: parseInt(departementId),
+        departementId,
       },
     });
 

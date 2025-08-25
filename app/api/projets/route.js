@@ -24,7 +24,7 @@ export async function POST(req) {
     const projet = await prisma.projet.create({
       data: {
         nom,
-        clientId: parseInt(clientId)
+        clientId
       }
     })
 
