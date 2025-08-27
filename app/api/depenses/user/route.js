@@ -30,7 +30,8 @@ export async function GET() {
         include: {
           client: true,
         },
-      }
+      },
+      fichiers: true
     },
     where: {
       employeId: employeId,

@@ -91,6 +91,16 @@ model Depense {
   createdAt   DateTime      @default(now())
   employe     User          @relation(fields: [employeId], references: [id])
   projet      Projet        @relation(fields: [projetId], references: [id])
+  fichiers   DepenseFile[]
+}
+
+model DepenseFile {
+  id         String   @id @default(cuid())
+  name       String
+  url        String
+  depenseId  String
+  depense    Depense  @relation(fields: [depenseId], references: [id])
+  createdAt  DateTime @default(now())
 }
 
 model Conge {

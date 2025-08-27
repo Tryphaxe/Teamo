@@ -36,13 +36,6 @@ export default function Header() {
 	const isActive = (href) => pathname.startsWith(href);
 	const router = useRouter()
 
-	const setShowSettings = () => {
-		router.push('/dashboard/parametres')
-	};
-	const boutons = [
-		{ href: '/dashboard/parametres', icon: Settings, onClick: () => setShowSettings() },
-	];
-
 	// Initialisation user + notifications
 	useEffect(() => {
 		const init = async () => {
@@ -80,9 +73,9 @@ export default function Header() {
 							<Image
 								alt="Teamo logo"
 								src="/images/timo.png"
-								width={60}
-								height={60}
-								className="h-8 w-auto"
+								width={100}
+								height={100}
+								className="h-12 w-auto"
 							/>
 							<div className="flex items-center gap-3 pl-4 border-l border-gray-200">
 								<div className="text-right flex items-center justify-center">
@@ -107,19 +100,6 @@ export default function Header() {
 								)}
 							</button>
 
-							{boutons.map((item) => {
-								const Icon = item.icon;
-								return (
-									<button key={item.href} onClick={item.onClick}
-										className={`px-2 py-2 cursor-pointer border border-gray-200 rounded-full transition-all ${isActive(item.href)
-											? 'bg-orange-200 text-black'
-											: 'bg-white text-black hover:bg-gray-100'
-											}`}>
-										<Icon className="w-5 h-5" />
-									</button>
-								);
-							})}
-
 							<div className="flex items-center pl-2 border-l border-gray-200">
 								{/* Profile dropdown */}
 								<Menu as="div" className="relative">
@@ -139,26 +119,20 @@ export default function Header() {
 									>
 										<MenuItem>
 											<span className="block px-4 py-2 text-sm text-orange-700 data-focus:bg-gray-100 data-focus:outline-hidden">
-												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.nom : 'Non connecté'}
+												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? (user.nom +" "+ user.prenom) : 'Non connecté'}
 											</span>
 										</MenuItem>
 										<MenuItem>
-											<span></span>
+											<span className="block px-4 py-2 text-sm text-orange-700 data-focus:bg-gray-100 data-focus:outline-hidden">
+												{loading ? (<Loader2 className="h-4 w-4 animate-spin" />) : user ? user.email : '----------------'}
+											</span>
 										</MenuItem>
 										<MenuItem>
 											<a
-												href="#"
+												href="/dashboard/settings"
 												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
 											>
-												Mon profil
-											</a>
-										</MenuItem>
-										<MenuItem>
-											<a
-												href="#"
-												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-											>
-												Paramètres
+												Exportation
 											</a>
 										</MenuItem>
 										<MenuItem>

@@ -10,6 +10,8 @@ import { fetchConges } from '@/lib/api/apiConge';
 import { formatDate, getFormattedDate, getHeureFromDate } from '@/lib/date';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import MyBar from '@/components/BarChart';
+import CongesAreaChart from '@/components/AreaChart';
 
 export default function Page() {
 	const [employes, setEmployes] = useState([]);
@@ -117,6 +119,11 @@ export default function Page() {
 						</div>
 					);
 				})}
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+				<MyBar />
+				<CongesAreaChart />
 			</div>
 
 			<div className="flex items-center justify-between bg-gradient-to-r from-white to-gray-50 rounded-lg px-6 py-2 text-black mb-3">

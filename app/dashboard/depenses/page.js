@@ -93,12 +93,6 @@ export default function Page() {
 								</ListboxOptions>
 							</div>
 						</Listbox>
-						<button
-							onClick={() => setShowForm(true)}
-							className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
-						>
-							<Upload className="w-4 h-4" />
-						</button>
 					</div>
 				</div>
 				<div className="overflow-x-auto custom-scrollbar">
@@ -132,6 +126,9 @@ export default function Page() {
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Date dépense
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Justificatifs
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Statut
@@ -171,6 +168,23 @@ export default function Page() {
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{formatDate(dep.date)}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+											{dep.fichiers.length > 0 ? (
+												dep.fichiers.map((file) => (
+													<div key={file.id} className="mb-2">
+														<a
+															href={file.url}
+															download={file.name}
+															className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition"
+														>
+															⬇️ Télécharger : {file.name}
+														</a>
+													</div>
+												))
+											) : (
+												<span className="text-gray-400 italic">Aucun justificatif</span>
+											)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{dep.statut === "EN_ATTENTE" && (

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Check, Filter, Info, ListFilter, Plus, Radius, Upload, User, X } from 'lucide-react';
+import { Check, File, Filter, Info, ListFilter, Plus, Radius, Upload, User, X } from 'lucide-react';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { formatDate } from '@/lib/date';
@@ -17,6 +17,7 @@ export default function Page() {
 	const [depenses, setDepenses] = useState([]);
 	const [isloading, setIsLoading] = useState(true);
 	const [loading, setLoading] = useState(false);
+	const [previewUrl, setPreviewUrl] = useState(null);
 
 	const filtresDepenses = [
 		{ id: null, nom: 'Toutes' },
@@ -44,7 +45,7 @@ export default function Page() {
 	const [form, setForm] = useState({
 		description: '',
 		projetId: '',
-		montant: '',
+		montant: ''
 	});
 	const handleChange = (e) => handleFormChange(e, form, setForm);
 
@@ -59,6 +60,18 @@ export default function Page() {
 			successMessage: "Dépense ajoutée avec succès.",
 			errorMessage: "Erreur lors de l'ajout de la dépense.",
 		});
+	};
+
+	const handleFileChange = (e) => {
+		const file = e.target.files[0];
+		setForm(prev => ({ ...prev, fichier: file }));
+
+		if (file) {
+			const url = URL.createObjectURL(file);
+			setPreviewUrl(url);
+		} else {
+			setPreviewUrl(null);
+		}
 	};
 
 	return (
@@ -109,6 +122,57 @@ export default function Page() {
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									required
 								/>
+							</div>
+						</div>
+						<div className="col-span-full">
+							<label htmlFor="file-upload" className="block text-sm/6 font-medium text-blue-950">
+								Justificatif (image ou PDF)
+							</label>
+
+							<div className="mt-2 flex justify-center rounded-lg border border-dashed border-blue-950/25 bg-blue-50 px-6 py-10">
+								<div className="text-center">
+									<File className="mx-auto size-12 text-gray-600" />
+									<div className="mt-4 flex text-sm/6 text-gray-400">
+										<label
+											htmlFor="file-upload"
+											className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-400 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-500 hover:text-indigo-300"
+										>
+											<span>Téléverser un fichier</span>
+											<input
+												id="file-upload"
+												name="file-upload"
+												type="file"
+												accept="image/*,application/pdf"
+												onChange={handleFileChange}
+												className="sr-only"
+											/>
+										</label>
+										<p className="pl-1">ou glisser-déposer</p>
+									</div>
+									<p className="text-xs/5 text-gray-400">PNG, JPG, PDF jusqu'à 10MB</p>
+
+									{/* Preview */}
+									{previewUrl && (
+										<div className="mt-4">
+											{form.fichier?.type.startsWith('image/') ? (
+												<img
+													src={previewUrl}
+													alt="Aperçu"
+													className="mx-auto max-h-48 rounded-lg border border-gray-300 shadow"
+												/>
+											) : (
+												<a
+													href={previewUrl}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-blue-400 underline"
+												>
+													Voir
+												</a>
+											)}
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
 						<div className="flex gap-2">
@@ -196,12 +260,6 @@ export default function Page() {
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="p-3 border-b border-gray-200 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900">Liste des dépenses</h3>
-					<button
-						onClick={() => setShowForm(true)}
-						className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
-					>
-						<Upload className="w-4 h-4" />
-					</button>
 				</div>
 				<div className="overflow-x-auto custom-scrollbar">
 					{isloading ? (
@@ -240,6 +298,9 @@ export default function Page() {
 										Date
 									</th>
 									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Justificatif
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										Statut
 									</th>
 								</tr>
@@ -270,6 +331,23 @@ export default function Page() {
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{formatDate(dep.date)}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+											{dep.fichiers.length > 0 ? (
+												dep.fichiers.map((file) => (
+													<div key={file.id} className="mb-2">
+														<a
+															href={file.url}
+															download={file.name}
+															className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition"
+														>
+															⬇️ Télécharger : {file.name}
+														</a>
+													</div>
+												))
+											) : (
+												<span className="text-gray-400 italic">Aucun justificatif</span>
+											)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 											{dep.statut === "EN_ATTENTE" && (

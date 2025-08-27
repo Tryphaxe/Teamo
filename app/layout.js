@@ -8,7 +8,7 @@ const afacad = Afacad({
 });
 
 export const metadata = {
-	title: "JMK",
+	title: "JMK Employe Manager",
 	description: "Personal Management System",
 	icons: {
 		icon: "/timo.png",

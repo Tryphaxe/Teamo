@@ -163,7 +163,7 @@ export default function LoginPageWrapper() {
 				{/* Footer */}
 				<div className="mt-8 text-center">
 					<p className="text-xs text-gray-500">
-						© 2025 Teamo. Tous droits réservés.
+						© 2025 JMK. Tous droits réservés.
 					</p>
 				</div>
 			</div>

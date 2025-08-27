@@ -11,6 +11,7 @@ export async function GET() {
   const depenses = await prisma.depense.findMany({
     include: {
       employe: true,
+      fichiers: true,
       projet: {
         include: {
           client: true,
@@ -27,7 +28,7 @@ export async function GET() {
 // POST : créer une dépense
 export async function POST(req) {
   const body = await req.json();
-  const { montant, description, projetId, date } = body;
+  const { montant, description, projetId, date, justificatifUrl, justificatifName } = body;
 
   // 1. Lire le token dans les cookies
   const cookieStore = await cookies();
@@ -58,9 +59,19 @@ export async function POST(req) {
       montant: parseFloat(montant),
       description,
       employeId,
-      projetId,
+      projetId
     },
   });
+
+  if (justificatifUrl && justificatifName) {
+    await prisma.depenseFile.create({
+      data: {
+        name: justificatifName,
+        url: justificatifUrl,
+        depenseId: depense.id,
+      },
+    });
+  }
 
   // 4. Récupérer l'employé
   const employe = await prisma.user.findUnique({ where: { id: employeId } });

@@ -208,12 +208,6 @@ export default function Page() {
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="p-3 border-b border-gray-200 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900">Liste des demandes</h3>
-					<button
-						onClick={() => setShowForm(true)}
-						className="flex items-center cursor-pointer border border-gray-300 gap-2 p-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
-					>
-						<Upload className="w-4 h-4" />
-					</button>
 				</div>
 				<div className="overflow-x-auto custom-scrollbar">
 					{isloading ? (

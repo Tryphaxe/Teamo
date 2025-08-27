@@ -21,6 +21,7 @@ const navigation = [
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
 }
+const supabase = create();
 
 export default function Header() {
 	const pathname = usePathname();
@@ -33,7 +34,6 @@ export default function Header() {
 	const isActive = (href) => pathname.startsWith(href);
 	const router = useRouter()
 
-	const supabase = create();
 	const fetchNotifications = async (userId) => {
 		const { data, error } = await supabase
 			.from("Notification")
@@ -141,7 +141,9 @@ export default function Header() {
 			});
 
 		return () => {
-			supabase.removeChannel(channel);
+			if (channel) {
+				supabase.removeChannel(channel);
+			}
 		};
 	}, []);
 
@@ -180,11 +182,10 @@ export default function Header() {
 							<Image
 								alt="Teamo logo"
 								src="/images/timo.png"
-								width={60}
-								height={60}
-								className="h-8 w-auto"
+								width={100}
+								height={100}
+								className="h-12 w-auto"
 							/>
-							<span className='text-blue-600 font-bold text-xl sm:block hidden'>Teamo</span>
 							<div className="flex items-center gap-3 pl-4 border-l border-gray-200">
 								<div className="text-sm font-medium text-gray-900 flex items-center justify-center">
 									{loading ? (<span className="px-10 h-6 bg-blue-100 rounded-md animate-pulse w-full"></span>) : user ? (user.nom) : 'Non connecté'}
@@ -208,7 +209,7 @@ export default function Header() {
 								)}
 							</button>
 
-							<div className="flex items-center pl-2 border-l border-gray-200">
+							<div className="flex items-center pl-2">
 								{/* Profile dropdown */}
 								<Menu as="div" className="relative">
 									<MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800">
