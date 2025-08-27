@@ -135,7 +135,7 @@ export default function Page() {
 									<div className="mt-4 flex text-sm/6 text-gray-400">
 										<label
 											htmlFor="file-upload"
-											className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-400 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-500 hover:text-indigo-300"
+											className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-400"
 										>
 											<span>Téléverser un fichier</span>
 											<input
@@ -149,31 +149,23 @@ export default function Page() {
 										</label>
 										<p className="pl-1">ou glisser-déposer</p>
 									</div>
-									<p className="text-xs/5 text-gray-400">PNG, JPG, PDF jusqu'à 10MB</p>
+									<p className="text-xs/5 text-gray-400">PNG, JPG, PDF jusqu&apos;à 10MB</p>
 
-									{/* Preview */}
-									{previewUrl && (
-										<div className="mt-4">
-											{form.fichier?.type.startsWith('image/') ? (
-												<img
-													src={previewUrl}
-													alt="Aperçu"
-													className="mx-auto max-h-48 rounded-lg border border-gray-300 shadow"
-												/>
-											) : (
-												<a
-													href={previewUrl}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="text-blue-400 underline"
-												>
-													Voir
-												</a>
-											)}
+									{/* Affichage du fichier uploadé */}
+									{form.fichier && (
+										<div className="mb-2">
+											<a
+												href={previewUrl}
+												download={form.fichier.name}
+												className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition"
+											>
+												⬇️ Fichier : {form.fichier.name}
+											</a>
 										</div>
 									)}
 								</div>
 							</div>
+
 						</div>
 						<div className="flex gap-2">
 							<button
